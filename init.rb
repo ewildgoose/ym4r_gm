@@ -1,2 +1,5 @@
+#load the gmaps_api_key.yml file
+
 require 'gm'
-include Ym4r::GmPlugin
+
+
