@@ -14,7 +14,7 @@ end
 
 desc 'Generate documentation for the gm plugin.'
 Rake::RDocTask.new(:rdoc) do |rdoc|
-  rdoc.rdoc_dir = 'gm-rdoc'
+  rdoc.rdoc_dir = 'ym4r_gm-doc'
   rdoc.title    = 'GM'
   rdoc.options << '--line-numbers' << '--inline-source'
   rdoc.rdoc_files.include('README')
