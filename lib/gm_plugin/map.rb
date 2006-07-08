@@ -27,8 +27,6 @@ module Ym4r
 
       #Outputs the header necessary to use the Google Maps API. By default, it also outputs a style declaration for VML elements (can be changed with the option <tt>:with_vml</tt>). You can also pass a host with the <tt>:host</tt> option: If you use Rails, you should pass <tt>:host => @request.host</tt>. This host must have a corresponding API key in the config.yml file. If you don't care about multiple hosts or want to manage the keys yourself, you should not pass the <tt>:host</tt> option and the config.yml should only contain a single API key.
       def self.header(options = {})
-        
-        
         options[:with_vml] = true unless options.has_key?(:with_vml)
         if options.has_key?(:key)
           api_key = options[:key]
