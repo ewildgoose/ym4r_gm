@@ -88,12 +88,19 @@ module Ym4r
         @init << add_overlay(overlay)
       end
 
-      #Sets up a new map type. If +add+ is false, all the other map types of the map are wiped out. If +set+ is true, the current map type for the map is set to +map_type+. If you want to access the map type in other methods, you should declare the map type first.
-      def map_type_init(map_type, add = true)
+      #Sets up a new map type. If +add+ is false, all the other map types of the map are wiped out. If you want to access the map type in other methods, you should declare the map type first (with +declare_init+).
+      def add_map_type_init(map_type, add = true)
         unless add
           @init << get_map_types.set_property(:length,0)
         end
         @init << add_map_type(map_type)
+      end
+      #for legacy purpose
+      alias :map_type_init :add_map_type_init
+
+      #Sets the map type displayed by default after the map is loaded. It should be known from the map (ie either the default map types or a user-defined map type added with <tt>add_map_type_init</tt>). Use <tt>set_map_type_init(GMapType::G_SATELLITE_MAP)</tt> or <tt>set_map_type_init(GMapType::G_HYBRID_MAP)</tt> to initialize the map with repsecitvely the Satellite view and the hybrid view.
+      def set_map_type_init(map_type)
+        @init << set_map_type(map_type)
       end
 
       #Locally declare a MappingObject with variable name "name"
