@@ -1,21 +1,21 @@
 =YM4R/GM plugin for Rails
 
-This is version 0.5.1 of the YM4R/GM plugin for Rails (YM4RGMP4R??). It is a plugin for Rails aimed at facilitating the use of Google Maps from Rails application. It was born to better integrate to Rails projects the features of the YM4R gem relative to using Google Maps. It includes and enhances all the web application-related functionalities found in the YM4R gem as of version 0.4.1.
+This is version 0.5.1 of the YM4R/GM plugin for Rails (YM4RGMP4R?). It is a plugin for Rails aimed at facilitating the use of Google Maps from Rails application. It was made to better integrate to Rails projects the features of the YM4R gem relative to using Google Maps. It includes and enhances all the web application-related functionalities found in the YM4R gem as of version 0.4.1.
 
 ==Relation between the YM4R gem and the YM4R/GM plugin
 They are completely independent from each other.
 
-With the plugin, you don't need the YM4R gem anymore, unless you want to use the Yahoo! Maps Building Block API's, the tilers or the Google Maps geocoding REST API. Please refer to the documentation of the YM4R gem to know more about the functionalities in it.
+With the plugin, you don't need the YM4R gem anymore, unless you want to use the tilers or the Ruby helpers for the Yahoo! Maps Building Block API's and the Google Maps geocoding API. Please refer to the documentation of the YM4R gem to know more about the functionalities in it.
 
 Conversely, the YM4R gem does not need the plugin to work.
 
 ==Installation
 Install like any other Rails plugin:
-	script/plugin install http://thepochisuperstarmegashow.com/Plugins/Ym4r/gm
+	script/plugin install http://thepochisuperstarmegashow.com/Plugins/ym4r_gm
 
 As part of the installation procedure, the JavaScript files found in the <tt>PLUGIN_ROOT/javascript</tt> directory will be copied to the <tt>RAILS_ROOT/public/javascripts/</tt> directory. 
 
-Moreover a <tt>gmaps_api_key.yml</tt> file will also be created in the <tt>RAILS_ROOT/config/</tt> folder. If this file already exists (installed for example by a previous version of the plugin), nothing will be done to it, so you can keep your configuration data even after updating the plugin. This file is a YAML representation of a hash, similar to the <tt>database.yml</tt> file in that the primary keys in the file are the different environments (development, test, production), since you will probably need to have different Google Maps API keys depending on that criteria (for example: a key for localhost for development and test; a key for your host for production). If you don't have any special need, there will be only one key associated with each environment. If however, you need to have multiple keys (for example if your app will be accessible from multiple URLs, for which you need different keys), you can also associate a hash to the environment, whose keys will be the different hosts. Which key to use will be sorted out automatically, but could be overriden (?).
+Moreover a <tt>gmaps_api_key.yml</tt> file will also be created in the <tt>RAILS_ROOT/config/</tt> folder. If this file already exists (installed for example by a previous version of the plugin), nothing will be done to it, so you can keep your configuration data even after updating the plugin. This file is a YAML representation of a hash, similar to the <tt>database.yml</tt> file in that the primary keys in the file are the different environments (development, test, production), since you will probably need to have different Google Maps API keys depending on that criteria (for example: a key for localhost for development and test; a key for your host for production). If you don't have any special need, there will be only one key associated with each environment. If however, you need to have multiple keys (for example if your app will be accessible from multiple URLs, for which you need different keys), you can also associate a hash to the environment, whose keys will be the different hosts. In this case, you will need to pass a value to the <tt>:host</tt> key when calling the method <tt>GMap.header</tt> (usually <tt>@request.host</tt>).
 
 ==Migration from the YM4R gem
 Apart from the installation of the plugin detailed above, you will also need to delete the instructions to require the file and include the Ym4r::GoogleMaps module in your controllers:
@@ -27,7 +27,6 @@ This lines are now not needed since the plugin is loaded as part of the normal R
 You can use the library to display Google maps easily from Rails. The version of the API used is v2. The library is engineered so updates to the map through RJS/Ajax are possible. I have made available 2 in-depth tutorials to show some of the functionalities of the library and how it can be integrated with GeoRuby and the Spatial Adapter for Rails:
 - http://thepochisuperstarmegashow.com/2006/06/02/ym4r-georuby-spatial-adapter-demo/
 - http://thepochisuperstarmegashow.com/2006/06/03/google-maps-yahoo-traffic-mash-up/
-For the Geocoding API, see the section after this one.
 Following is some notes about manipulating Google Maps with the library:
 
 ===Naming conventions
@@ -51,7 +50,7 @@ While +center_zoom_init+, +control_init+ or +overlay_init+ (and generally all th
 The map is represented by a GMap object. You need to pass to the constructor the id of a DIV that will contain the map. You have to place this DIV yourself in your HTML template. You can also optionnally pass to the constructor the JavaScript name of the variable that will reference the map, which by default will be global in JavaScript. You have convenience methods to setup the controls, the center, the zoom, overlays, map types and the icons (which are also global). You can also pass arbitrary JavaScript to +record_init+ and +record_global_init+. Since, by default, the initialization of the map is performed in a callback function, if you want to have a globally accessible variable, you need to use the +global+ version.
 
 Then in your template, you have 2 necessary calls:
-- The static <tt>GMap.header</tt>: Outputs the inclusion of the JavaScript file from Google to make use of the Google Maps API and by default a style declaration for VML objects, necessary to display polylines under IE. This default can be overriddent by passing <tt>:with_vml => false</tt> as option to the +header+ method. You can also pass to this method a <tt>:host</tt> option in order to select the correct key for the location where your app is currently deployed.
+- The static <tt>GMap.header</tt>: Outputs the inclusion of the JavaScript file from Google to make use of the Google Maps API and by default a style declaration for VML objects, necessary to display polylines under IE. This default can be overriddent by passing <tt>:with_vml => false</tt> as option to the +header+ method. You can also pass to this method a <tt>:host</tt> option in order to select the correct key for the location where your app is currently deployed, in case the current environment has multiple possible keys. Usually, in this case, you should pass it <tt>@request.host</tt>. Finally you can override all the key settings in the configuration by passing a value to the <tt>:key</tt> key.
 - <tt>GMap#to_html</tt>: Outputs the initialization code of the map. By default, it outputs the +script+ tags and initializes the map in response to the onload event of the JavaScript window object.
 
 So you should have at least the following:
@@ -126,10 +125,10 @@ To add new markers in RJS (if the clusterer has been declared globally with over
 In this case, the <tt>:description</tt> passed to the GMarker contructor will not be taken into account. Only the +description+ passed in the call to +add_marker+ will.
 
 ===GeoRss Overlay
-An group of markers taken from a Rss feed containing location information in the basic geo (WGS83 lat/lon) vocabulary. See http://www.w3.org/2003/01/geo/ for more details. It is a bit confusing since this vocabulary is very often referred to as GeoRss, while being different from the current GeoRss standardization effort (http://georss.org). Maybe the latter vocabulary will be supported by YM4R in the future but it is not currently the case. The support for GeoRss relies on the MGeoRSS library by Mikel Maron (http://brainoff.com/gmaps/mgeorss.html), although a bit modified, mostly to have the GeoRssOverlay respect the GOverlay API.
+An group of markers taken from a Rss feed containing location information in the W3C basic geo (WGS83 lat/lon) vocabulary and in the Simple GeoRss format. See http://georss.org for more details. The support for GeoRss relies on the MGeoRSS library by Mikel Maron (http://brainoff.com/gmaps/mgeorss.html), although a bit modified, mostly to have the GeoRssOverlay respect the GOverlay API. It has also been enhanced by Andrew Turner who added support for the GeoRss Simple format.
 
 <b>Note that the <tt>geoRssOverlay.js</tt> file must be included in the HTML template in order to use this functionality.</b> You should have something like that in your template:
-	<%= javascript_include_tag("geoRssOVerlay") %>
+	<%= javascript_include_tag("geoRssOverlay") %>
 
 Here is how you would use it. First create the overlay at initialization:
 	def index
@@ -143,17 +142,17 @@ Since it is not possible to make requests outside the domain where the current p
            result = Net::HTTP.get_response("earthquake.usgs.gov","/eqcenter/recenteqsww/catalogs/eqs7day-M5.xml")
            render :xml => result.body
   	end
-If you don't want to hardwire the RSS feed location in an action, you can. But you will have to pass the <tt>:proxy</tt> option to the GeoRssOVerlay constructor. When requesting the RSS feed, the browser will in fact call the proxy with the actual URL of the RSS feed in the +q+ parameter of the request. Here is how you would initialize the GeoRssOVerlay that way:
+If you don't want to hardwire the RSS feed location in an action, you can. But you will have to pass the <tt>:proxy</tt> option to the GeoRssOverlay constructor. When requesting the RSS feed, the browser will in fact call the proxy with the actual URL of the RSS feed in the +q+ parameter of the request. Here is how you would initialize the GeoRssOverlay that way:
 	@map.overlay_init(GeoRssOverlay.new("http://earthquake.usgs.gov/eqcenter/recenteqsww/catalogs/eqs7day-M5.xml",
 	:proxy => url_for(:action => "proxy")))
-And here is the <tt>proxy</tt> action:
+And here is an example of <tt>proxy</tt> action:
 	def proxy
     	    result = Net::HTTP.get_response(URI.parse(@params[:q]))
     	    render :xml => result.body
   	end
-You should probably do some checks to ensure the proxy is not abused but it is of your respnsibility.
+You should probably do some checks to ensure the proxy is not abused but it is of your responsibility.
 
-Another option can be passed to the GeoRssOVerlay constructor to set an icon to be used by the markers of the overlay: <tt>:icon</tt>. By default it is equal to the default icon (the classic red one).
+Another option can be passed to the GeoRssOverlay constructor to set an icon to be used by the markers of the overlay: <tt>:icon</tt>. By default it is equal to the default icon (the classic red one).
 
 In the view, you should have something like the following:
 	<html>
@@ -174,12 +173,12 @@ It is now possible to easily add new map types, on top of the already existing o
 
 For exemple, here is how you would setup layers from a public WMS server of the DMAP team of the American Navy:
 	layer = WMSLayer.new("http://columbo.nrlssc.navy.mil/ogcwms/servlet/WMSServlet/AccuWeather_Maps.wms",
-	"20:3,6:3,0:27,0:29,6:19","",
-	{'prefix' => "Map Copyright 2006", 'copyright_texts'=> ["DMAP"]},
-	true,:mapserver,0..17,0.8,"png")
-This sets up a connection to a WMS service, requesting layers <tt>20:3,6:3,0:27,0:29,6:19</tt> (you would have to look at the GetCapabilities document of the service to know what the valid layers are), with default styles and a copyright notice attributing the data to DMAP. The layers are valid for zoom levels 0 to 17 (all the zoom levels). The images will be 80% opaque and will come as PNG.
+	"20:3,6:3,0:27,0:29,6:19",
+	:copyright => {'prefix' => "Map Copyright 2006", 'copyright_texts'=> ["DMAP"]},
+	:use_geographic => true, :opacity => 0.8)
+This sets up a connection to a WMS service, requesting layers <tt>20:3,6:3,0:27,0:29,6:19</tt> (you would have to look at the GetCapabilities document of the service to know what the valid layers are). The copyright notice attributes the data to DMAP. The images will be 80% opaque. For the rest of the options, the default values are used: default styles (<tt>:style</tt> option), PNG format (<tt>:format</tt> option), valid for all zoom levels (<tt>:zoom_range</tt> option). The option <tt>:merc_proj</tt> is irrelevant here since the <tt>:use_geographic</tt> option is true.
 
-The arguments +true+ and <tt>:mapserver</tt> warrant some explanation. The Google Maps are in the Simple Mercator projection in the WGS84 datum and currently do not support the display of data in projections other than that, although it may change in the future. Unfortunately, different WMS servers do not identify this projection the same way. So you can give to the WMSLayer constructor your server type and it will figure out what is the correct identifier. Currently, this works only for <tt>:mapserver</tt> (EPSG:54004) and <tt>:geoserver</tt> (EPSG:41001). For others you can directly pass a number corresponding to the EPSG definition of the simple Mercator projection of your server. On top of that, some servers just don't support the Simple Mercator projection. This is why there is a +true+ argument before <tt>:mapserver</tt> in the example. It is in order to tell the WMSLayer that it should request its tiles using LatLon coordinates in the WGS84 datum (which should be supported by any server). Unfortunately it is not perfect since the deformation is quite important for low zoom levels (< 5 for the US). Higher than that, the deformation is not that visible. However, if you control the WMS server, it is recommended that you have a +false+ in this argument and setup the Mercator projection in your server if it is not done by default.
+The arguments <tt>:use_geographic</tt> and <tt>:merc_proj</tt> warrant some explanation. The Google Maps are in the Simple Mercator projection in the WGS84 datum and currently do not support the display of data in projections other than that (at least if you want to display markers and lines on top of it). Unfortunately, different WMS servers do not identify this projection the same way. So you can give to the WMSLayer constructor your server type through the <tt>:merc_proj</tt> option  and it will figure out what is the correct identifier. Currently, this works only for <tt>:mapserver</tt> (EPSG:54004) and <tt>:geoserver</tt> (EPSG:41001). For others you can directly pass a number corresponding to the EPSG definition of the simple Mercator projection of your server. On top of that, some servers just don't support the Simple Mercator projection. This is why there is a <tt>:use_geographic</tt> option, that can be set to +true+. It is in order to tell the WMSLayer that it should request its tiles using LatLon coordinates in the WGS84 datum (which should be supported by any server in a consistant way). Unfortunately it is not perfect since the deformation is quite important for low zoom levels (< 5 for the US). Higher than that, the deformation is not that visible. However, if you control the WMS server, it is recommended that you don't use <tt>:use_geographic</tt> and instead use the <tt>:merc_proj</tt> option and setup the Mercator projection in your server if it is not done by default.
 
 <b>Note that you need to include the <tt>wms-gs.js</tt> javascript file in your HTML page in order to make use of the WMSLayer functionality.</b> You should have something like that in your template:
 	<%= javascript_include_tag("wms-gs") %>
@@ -187,14 +186,14 @@ This file uses code by John Deck with the participation of others (read the top 
 
 Here is how to define a pretiled layer:
 	layer = PreTiledLayer.new("http://localhost:3000/tiles",
-	{'prefix' => "Map C 2006", 'copyright_texts' => ["Open Atlas"]},
-	13..13,0.7,"gif")
-I tell the PreTiledLayer constructor where I can find the tiles, setup the Copyright string, the valid zooms for the map, the opacity and the format. Tiles must have standardized names: <tt>tile_#{zoom}_#{x_tile}_#{y_tile}.#{format}</tt> (here the format is "gif"). You can use tools found in the YM4R gem to generate tiles in this format either from local maps or from WMS servers (useful to create tiles from geographic data files without having to run a map server or to cache images from slow servers). 
+	:copyright => {'prefix' => "Map C 2006", 'copyright_texts' => ["Open Atlas"]},
+	:zoom_range => 13..13, :opacity => 0.7, :format => "gif")
+I tell the PreTiledLayer constructor where I can find the tiles, setup the Copyright string, the valid zooms for the map, the opacity and the format. Tiles must have standardized names: <tt>tile_#{zoom}_#{x_tile}_#{y_tile}.#{format}</tt> (here the format is "gif"). You can use tools found in the YM4R gem to generate tiles in this format either from local maps or from WMS servers (useful to create tiles from geographic data files without having to run a map server or to cache images from slow servers). Again refer to the documentation of the gem for more information on how to do this.
 
 Instead of having the tiles requested directly, you can also decide to have an action on the server which takes care of it. You can used the class PreTiledLayerFromAction for this. In this case, the first argument of the constructor is an url of an action. The arguments +x+, +y+ and +z+ will be passed to it.
 	layer = PreTiledLayerFromAction.new(url_for(:action => :get_tile),
-	{'prefix' => "Map C 2006", 'copyright_texts' => ["Open Atlas"]},
-	13..14,0.7,"png")
+	:copyright => {'prefix' => "Map C 2006", 'copyright_texts' => ["Open Atlas"]},
+	:zoom_range => 13..14, :opacity => 0.7)
 The other constructor arguments have the same meaning as PreTiledLayer. Here is an uninteresting example of action that serves tiles:
 	def get_tile
           x = @params[:x]
@@ -216,16 +215,23 @@ This is actually the simplest configuration possible. Your map type has only one
 Here for the "Test WMS" map type, we also take the first layer of the "Satellite" map type in the background and overlay the second layer of the "Hybrid" map type (roads, country boundaries, etc... transparently overlaid on top of the preceding layers) so when the "Test WMS" map type is selected in the interface, all three layers will be displayed.
 
 Finally to add a map type to a GMap:
-	@map.map_type_init(map_type)
-If you want to wipe out the existing map types (for example the 3 default ones), you can add a +false+ argument to the +map_type_init+ method and the +map_type+ will be the only one.
+	@map.add_map_type_init(map_type)
+If you want to wipe out the existing map types (for example the 3 default ones), you can add a +false+ argument to the +add_map_type_init+ method and the +map_type+ will be the only one.
 
-==Changes since last version
+If you want to setup the map as the default one when the map is initially displayed, you should first declare the map type then add it to the map as indicated above and finally setting it as the default map type:
+	@map.declare_init(map_type,"my_map_type")
+	@map.add_map_type_init(map_type)
+	@map.set_map_type_init(map_type)
+Future versions of the plugin may simplify that.
+
+==Changes since the last version
 - Repackaging of the Google Maps related functionalities of YM4R into this Rails plugin
+- Changed the way to pass options to the GTileLayer (and related classes) constructor. Now it uses an option hash.
+- Addition of support for the GeoRss Simple format in the GeoRssOverlay class.
 
 ==TODO
 - Add support for easy manipulation of external Google Maps-related libraries: Advanced tooltip manipulation,...
-- Addition of all GeoRss vocabularies to the geoRssOverlay extension
-- Complete support of the currently standardizing GeoRss vocabulary.
+- Addition of all GeoRss vocabularies (with all features: polylines...) to the geoRssOverlay extension
 - Tutorials
 
 ==Disclaimer
@@ -235,7 +241,7 @@ This software is not endorsed in any way by Google.
 The YM4R/GM plugin bundles JavaScript libraries from John Deck (WMS layers on Google Maps), Jef Poskanzer (Clusterer on Google Maps) and Mikel Maron (GeoRss on Google Maps).
 
 ==License
-The YM4R/GM plugin is released under the MIT license. The <tt>clusterer.js</tt> file is redistributed with a different license (but still compatible with the MIT license). Check the top of the file in <tt>PLUGIN_ROOT/javascript<tt> to know more.
+The YM4R/GM plugin is released under the MIT license. The <tt>clusterer.js</tt> file is redistributed with a different license (but still compatible with the MIT license). Check the top of the file in <tt>PLUGIN_ROOT/javascript</tt> to know more.
 
 ==Support
 Any questions, enhancement proposals, bug notifications or corrections can be sent to mailto:guilhem.vellut+ym4r@gmail.com.
