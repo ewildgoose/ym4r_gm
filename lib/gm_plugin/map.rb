@@ -1,6 +1,6 @@
 module Ym4r
   module GmPlugin 
-    #The Ruby-space class representing the Google Maps API class GMap2.
+    #Representing the Google Maps API class GMap2.
     class GMap
       include MappingObject
       
@@ -43,13 +43,18 @@ module Ym4r
           api_key = GMAPS_API_KEY
         end
         a = "<script src=\"http://maps.google.com/maps?file=api&v=2&key=#{api_key}\" type=\"text/javascript\"></script>\n"
+        a << "<script src=\"/javascripts/ym4r-gm.js\" type=\"text/javascript\"></script>\n"
         a << "<style type=\"text/css\">\n v\:* { behavior:url(#default#VML);}\n</style>" if options[:with_vml]
         a
       end
      
-      #Outputs the <div id=...></div> which has been configured to contain the map
-      def div
-        "<div id=\"#{@container}\"></div>"
+      #Outputs the <div id=...></div> which has been configured to contain the map. You can pass <tt>:width</tt> and <tt>:height</tt> as options to output this in the style attribute of the DIV element (you could also achieve the same effect by putting the dimension info into a CSS or using the instance method GMap#header_width_height)
+      def div(options = {})
+        attributes = "id=\"#{@container}\" "
+        if options.has_key?(:height) && options.has_key?(:width)
+          attributes += "style=\"width:#{options[:width]};height:#{options[:height]}\""
+        end
+        "<div #{attributes}></div>"
       end
 
       #Outputs a style declaration setting the dimensions of the DIV container of the map. This info can also be set manually in a CSS.
@@ -132,7 +137,7 @@ module Ym4r
         @global_init << variable.declare(name)
       end
       
-      #Outputs the initialization code for the map. By default, it outputs the script tags, performs the initialization in reponse to the onload event of the window and makes the map globally available.
+      #Outputs the initialization code for the map. By default, it outputs the script tags, performs the initialization in response to the onload event of the window and makes the map globally available.
       def to_html(options = {})
         no_load = options[:no_load]
         no_script_tag = options[:no_script_tag]
@@ -142,13 +147,9 @@ module Ym4r
         html = ""
         html << "<script type=\"text/javascript\">\n" if !no_script_tag
         #put the functions in a separate javascript file to be included in the page
-        html << "function addInfoWindowToMarker(marker,info){\nGEvent.addListener(marker, \"click\", function() {\nmarker.openInfoWindowHtml(info);\n});\nreturn marker;\n}\n"
-        html << "function addInfoWindowTabsToMarker(marker,info){\nGEvent.addListener(marker, \"click\", function() {\nmarker.openInfoWindowTabsHtml(info);\n});\nreturn marker;\n}\n"
-        html << "function addPropertiesToLayer(layer,getTile,copyright,opacity,isPng){\nlayer.getTileUrl = getTile;\nlayer.getCopyright = copyright;\nlayer.getOpacity = opacity;\nlayer.isPng = isPng;\nreturn layer;\n}\n"
-        html << "function addOptionsToIcon(icon,options){\nfor(var k in options){\nicon[k] = options[k];\n}\nreturn icon;\n}\n"
         html << @global_init * "\n"
         html << "var #{@variable};\n" if !no_declare and !no_global
-        html << "window.onload = function() {\nif (GBrowserIsCompatible()) {\n" if !no_load
+        html << "window.onload = addCodeToFunction(window.onload,function() {\nif (GBrowserIsCompatible()) {\n" if !no_load
         if !no_declare and no_global 
           html << "#{declare(@variable)}\n"
         else
@@ -157,8 +158,7 @@ module Ym4r
         html << @init_begin * "\n"
         html << @init * "\n"
         html << @init_end * "\n"
-        html << "\n}\n}\n" if !no_load
-        html << "window.onunload = GUnload;\n"
+        html << "\n}\n});\n" if !no_load
         html << "</script>" if !no_script_tag
         html
       end
