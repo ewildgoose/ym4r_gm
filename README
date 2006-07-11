@@ -53,7 +53,7 @@ Conversely, the YM4R gem does not need the plugin to work.
 
 ==Installation
 Install like any other Rails plugin:
-	script/plugin install http://thepochisuperstarmegashow.com/Plugins/ym4r_gm
+	ruby script/plugin install svn://rubyforge.org/var/svn/ym4r/Plugins/GM/trunk/ym4r_gm
 
 As part of the installation procedure, the JavaScript files found in the <tt>PLUGIN_ROOT/javascript</tt> directory will be copied to the <tt>RAILS_ROOT/public/javascripts/</tt> directory. 
 
@@ -95,13 +95,18 @@ Then in your template, you have 2 necessary calls:
 - The static <tt>GMap.header</tt>: Outputs the inclusion of the JavaScript file from Google to make use of the Google Maps API and by default a style declaration for VML objects, necessary to display polylines under IE. This default can be overriddent by passing <tt>:with_vml => false</tt> as option to the +header+ method. You can also pass to this method a <tt>:host</tt> option in order to select the correct key for the location where your app is currently deployed, in case the current environment has multiple possible keys. Usually, in this case, you should pass it <tt>@request.host</tt>. Finally you can override all the key settings in the configuration by passing a value to the <tt>:key</tt> key.
 - <tt>GMap#to_html</tt>: Outputs the initialization code of the map. By default, it outputs the +script+ tags and initializes the map in response to the onload event of the JavaScript window object.
 
-So you should have at least the following:
+So you should have the following:
 	<html><head><title>Hello</title>
 	<%= GMap.header %>
 	<%= @map.to_html %>
 	</head>
-	<body><%= @map.div %></body>
+	<body><%= @map.div(:width => 600,:height => 400) %></body>
 	</html>
+
+<b>Note that you need to set a size for the map DIV element at some point or the map will not be displayed.</b> You have a few ways to do this:
+- You define it yourself, wherever you want. Usually as part of the layout definition in an external CSS.
+- In the head of the document, through a CSS instruction output by <tt>@map.header_width_height</tt>, to which you pass 2 arguments (width and height).
+- When outputting the DIV with <tt>@map.div</tt>, you can also pass an option hash, with keys <tt>:width</tt> and <tt>:height</tt> and a style attribute for the DIV element will be output.
 
 ===Update of the map
 You are able to update the map through Ajax. For example, in Ruby-on-Rails, you have something called RJS, which sends JavaScript created on the server as a response to an action, which is later interpreted by the browser. It is usually used for visual effects and replacing or adding elements. It can also accept arbitrary JavaScript and this is what YM4R uses.
