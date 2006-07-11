@@ -61,9 +61,7 @@ GMarkerGroup.prototype.addMarker = function(marker,id){
 GMarkerGroup.prototype.showMarker = function(id){
     var marker = this.markersById[id];
     if(marker != undefined){
-	//Check if I can just send the click event to the marker
 	GEvent.trigger(marker,"click");
-
     }
 }
 

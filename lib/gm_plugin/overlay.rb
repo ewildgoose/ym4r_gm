@@ -166,19 +166,27 @@ module Ym4r
       end
     end
     
-    require 'uri'
+    #Makes the link with the MGeoRSS extension by Mikel Maron (a bit modified though). It lets you overlay on top of Google Maps the items present in a RSS feed that has GeoRss data. This data can be either in W3C Geo vocabulary or in the GeoRss Simple format. See http://georss.org to know more about GeoRss.
     class GeoRssOverlay
       include MappingObject
-      attr_accessor :url, :proxy, :icon
+      attr_accessor :url, :proxy, :icon, :options
       
+      #You can pass the following options:
+      #- <tt>:icon</tt>: An icon for the items of the feed. Defaults to the class red ballon icon.
+      #- <tt>:proxy</tt>: An URL on your server which will take care of fetching the RSS feed.
+      #- <tt>:list_div</tt>: In case you want a list of all the markers, with a link on which you can click in order to display the info on the marker, use this option to indicate the ID of the div (that you must place yourself).
+      #- <tt>:list_item_class<tt>: class of the DIV containing each item of the list. Ignored if option <tt>:list_div</tt> is not set.
+      #- <tt>:limit</tt>: Maximum number of items to display on the map.
+      #- <tt>:content_div</tt>: Instead of having an info window appear, indicates the ID of the DIV where this info should be displayed.
       def initialize(url, options = {})
         @url = url
-        @icon = options[:icon] || GIcon::DEFAULT
-        @proxy = options[:proxy] || Variable::UNDEFINED
+        @icon = options.delete(:icon) || GIcon::DEFAULT
+        @proxy = options.delete(:proxy) || Variable::UNDEFINED
+        @options = options 
       end
 
       def create 
-        "new GeoRssOverlay(#{MappingObject.javascriptify_variable(@url)},#{MappingObject.javascriptify_variable(@icon)},#{MappingObject.javascriptify_variable(@proxy)})"
+        "new GeoRssOverlay(#{MappingObject.javascriptify_variable(@url)},#{MappingObject.javascriptify_variable(@icon)},#{MappingObject.javascriptify_variable(@proxy)},#{MappingObject.javascriptify_variable(@options)})"
       end
     end
 

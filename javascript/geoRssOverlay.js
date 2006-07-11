@@ -4,7 +4,7 @@
 // Copyright 2006 Mikel Maron (email: mikel_maron yahoo com)
 //
 // The original version of this code is called MGeoRSS and can be found
-// at the following adress:
+// at the following address:
 // http://brainoff.com/gmaps/mgeorss.html
 //
 // Modified by Andrew Turner to add support for the GeoRss Simple vocabulary
@@ -14,10 +14,14 @@
 //
 // This work is public domain
 
-function GeoRssOverlay(rssurl,icon,proxyurl){
+function GeoRssOverlay(rssurl,icon,proxyurl,options){
     this.rssurl = rssurl;
     this.icon = icon;
     this.proxyurl = proxyurl;
+    this.listDiv = options['listDiv']; //ID of the item list DIV
+    this.contentDiv = options['contentDiv']; //ID of the content DIV
+    this.listItemClass = options['listItemClass']; //Class of the list item DIV
+    this.limitItems = options['limit']; //Maximum number of displayed entries
     this.request = false;
     this.markers = [];
 }
@@ -36,6 +40,13 @@ GeoRssOverlay.prototype.redraw = function(force){
 GeoRssOverlay.prototype.remove = function(){
     for(var i= 0, len = this.markers.length ; i< len; i++){
 	this.map.removeOverlay(this.markers[i]);
+    }
+}
+
+GeoRssOverlay.prototype.showMarker = function(id){
+    var marker = this.markers[id];
+    if(marker != undefined){
+	GEvent.trigger(marker,"click");
     }
 }
 
@@ -76,9 +87,9 @@ GeoRssOverlay.prototype.callback = function() {
 		//Atom
 		var items = xmlDoc.documentElement.getElementsByTagName("entry");
 	    }
-	    for (var i = 0; i < items.length; i++) {
+	    for (var i = 0, len = this.limitItems?Math.min(this.limitItems,items.length):items.length; i < len; i++) {
 		try {
-		    var marker = this.createMarker(items[i]);
+		    var marker = this.createMarker(items[i],i);
 		    this.markers.push(marker);
 		    this.map.addOverlay(marker);
 		} catch (e) {
@@ -89,7 +100,7 @@ GeoRssOverlay.prototype.callback = function() {
     }
 }
 
-GeoRssOverlay.prototype.createMarker = function(item) {
+GeoRssOverlay.prototype.createMarker = function(item,index) {
     
     var title = item.getElementsByTagName("title")[0].childNodes[0].nodeValue;
     if(item.getElementsByTagName("description").length != 0){
@@ -131,9 +142,33 @@ GeoRssOverlay.prototype.createMarker = function(item) {
     var marker = new GMarker(point,{'title': title});
     var html = "<a href=\"" + link + "\">" + title + "</a><p/>" + description;
     
-    GEvent.addListener(marker, "click", function() {
-	marker.openInfoWindowHtml(html);
-    });
+    if(this.contentDiv == undefined){
+	GEvent.addListener(marker, "click", function() {
+	    marker.openInfoWindowHtml(html);
+	});
+    }else{
+	var contentDiv = this.contentDiv;
+	GEvent.addListener(marker, "click", function() {
+	    document.getElementById(contentDiv).innerHTML = html;
+	});
+    }
+    
+    if(this.listDiv != undefined){
+	var a = document.createElement('a'); 
+	a.innerHTML = title;
+	a.setAttribute("href","#");
+	var georss = this;
+	a.onclick = function(){
+	    georss.showMarker(index);
+	    return false;
+	};
+	var div = document.createElement('div');
+	if(this.listItemClass != undefined){
+	    div.setAttribute("class",this.listItemClass);
+	}
+	div.appendChild(a);
+	document.getElementById(this.listDiv).appendChild(div);
+    }
     
     return marker;
 }

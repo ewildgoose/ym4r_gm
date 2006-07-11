@@ -3,9 +3,9 @@
 This is version 0.5.1 of the YM4R/GM plugin for Rails (YM4RGMP4R?). It is a plugin for Rails aimed at facilitating the use of Google Maps from Rails application. It was made to better integrate to Rails projects the features of the YM4R gem relative to using Google Maps. It includes and enhances all the web application-related functionalities found in the YM4R gem as of version 0.4.1.
 
 ==Getting Started
-I present here the most commong operations you would want to do with YM4R/GM. Read the rest of the documents if you want more details.
+I present here the most common operations you would want to do with YM4R/GM. Read the rest of the documents if you want more details.
 
-In your controller, here is the initialization sequence in action +index+:
+In your controller, here is a typical initialization sequence in action +index+:
 	def index
 	  @map = GMap.new("map_div")
 	  @map.control_init(:large_map => true,:map_type => true)
@@ -91,9 +91,13 @@ While +center_zoom_init+, +control_init+ or +overlay_init+ (and generally all th
 ===Initialization of the map
 The map is represented by a GMap object. You need to pass to the constructor the id of a DIV that will contain the map. You have to place this DIV yourself in your HTML template. You can also optionnally pass to the constructor the JavaScript name of the variable that will reference the map, which by default will be global in JavaScript. You have convenience methods to setup the controls, the center, the zoom, overlays, map types and the icons (which are also global). You can also pass arbitrary JavaScript to +record_init+ and +record_global_init+. Since, by default, the initialization of the map is performed in a callback function, if you want to have a globally accessible variable, you need to use the +global+ version.
 
+You can also have multiple maps. Just make sure you give them different DIV id's, as well as different global variable names, when constructing them:
+	@map1 = GMap("map1_div","map1")
+	@map2 = GMap("map2_div","map2")
+
 Then in your template, you have 2 necessary calls:
 - The static <tt>GMap.header</tt>: Outputs the inclusion of the JavaScript file from Google to make use of the Google Maps API and by default a style declaration for VML objects, necessary to display polylines under IE. This default can be overriddent by passing <tt>:with_vml => false</tt> as option to the +header+ method. You can also pass to this method a <tt>:host</tt> option in order to select the correct key for the location where your app is currently deployed, in case the current environment has multiple possible keys. Usually, in this case, you should pass it <tt>@request.host</tt>. Finally you can override all the key settings in the configuration by passing a value to the <tt>:key</tt> key.
-- <tt>GMap#to_html</tt>: Outputs the initialization code of the map. By default, it outputs the +script+ tags and initializes the map in response to the onload event of the JavaScript window object.
+- <tt>GMap#to_html</tt>: Outputs the initialization code of the map. By default, it outputs the +script+ tags and initializes the map in response to the onload event of the JavaScript window object. You can call +to_html+ on each one of your maps to have them all initialized.
 
 So you should have the following:
 	<html><head><title>Hello</title>
@@ -215,6 +219,12 @@ In the view, you should have something like the following:
 	</html> 
 Note the inclusion of the <tt>geoRssOverlay.js</tt> file.
 
+Other options to pass to the GeoRssOverlay constructor are the following:
+- <tt>:list_div</tt>: In case you want to make a list of all the markers, with a link on which you can click in order to display the info on the marker, use this option to indicate the ID of the DIV (that you must place yourself on your page).
+- <tt>:list_item_class<tt>: class of the DIV containing each item of the list. Ignored if option <tt>:list_div</tt> is not set.
+- <tt>:limit</tt>: Maximum number of items to display on the map.
+- <tt>:content_div</tt>: Instead of having an info window appear, indicates the ID of the DIV where this info should be displayed.
+
 ===Adding new map types
 It is now possible to easily add new map types, on top of the already existing ones, like G_SATELLITE_MAP or G_NORMAL_MAP. The imagery for these new map types can come from layers of the standard map types or can be taken either from a WMS server or from pretiled images on a server (that can be generated with a tool that comes with the YM4R gem: refer to the README of the gem to know more about it). 
 
@@ -275,6 +285,7 @@ Future versions of the plugin may simplify that.
 - Repackaging of the Google Maps related functionalities of YM4R into this Rails plugin
 - Changed the way to pass options to the GTileLayer (and related classes) constructor. Now it uses an option hash.
 - Addition of support for the GeoRss Simple format in the GeoRssOverlay class.
+- Support of multiple maps
 
 ==TODO
 - Add support for easy manipulation of external Google Maps-related libraries: Advanced tooltip manipulation,...
