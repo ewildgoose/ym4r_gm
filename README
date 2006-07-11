@@ -2,6 +2,48 @@
 
 This is version 0.5.1 of the YM4R/GM plugin for Rails (YM4RGMP4R?). It is a plugin for Rails aimed at facilitating the use of Google Maps from Rails application. It was made to better integrate to Rails projects the features of the YM4R gem relative to using Google Maps. It includes and enhances all the web application-related functionalities found in the YM4R gem as of version 0.4.1.
 
+==Getting Started
+I present here the most commong operations you would want to do with YM4R/GM. Read the rest of the documents if you want more details.
+
+In your controller, here is the initialization sequence in action +index+:
+	def index
+	  @map = GMap.new("map_div")
+	  @map.control_init(:large_map => true,:map_type => true)
+	  @map.center_zoom_init([75.5,-42.56],4)
+	  @map.overlay_init(GMarker.new([75.6,-42.467],:title => "Hello", :info_window => "Info! Info!"))
+	end
+
+Here I create a GMap (which will be placed inside a DIV of id +map_div+), add controls (large zoom slider and pan cross + map type selector), set the center and the zoom and add a marker. Of these 4 steps only the creation of the map and the setting of the center and the zoom are absolutely necessary.
+
+In your view, here is what you would have:
+	<html><head><title>Test</title>
+	<%= GMap.header %>
+	<%= @map.to_html %>
+	</head><body>
+	<%= @map.div(:width => 600, :height => 400) %>
+	</body></html>
+
+First you must output the header, used by all the maps of the page: It includes the Google Maps API JS code and the JS helper functions of YM4R/GM. Then we initialize the map by calling <tt>@map.to_html</tt>. In the body, we need a DIV whose +id+ is the same as the one passed to the GMap constructor in the controller. The call to <tt>@map.div</tt> outputs such a DIV. We pass to it options to set the width and height of the map in the style attribute of the DIV. 
+
+<b>Note that you need to set a size for the map DIV element at some point or the map will not be displayed.</b> You have a few ways to do this:
+- You define it yourself, wherever you want. Usually as part of the layout definition in an external CSS.
+- In the head of the document, through a CSS instruction output by <tt>@map.header_width_height</tt>, to which you pass 2 arguments (width and height).
+- When outputting the DIV with <tt>@map.div</tt>, you can also pass an option hash, with keys <tt>:width</tt> and <tt>:height</tt> and a style attribute for the DIV element will be output.
+
+You can update the map trough RJS. Here is an action you can call from a <tt>link_remote_tag</tt> which would do this:
+	def update
+	  @map = Variable.new("map")
+	  @marker = GMarker.new([75.89,-42.767],:title => "Update", :info_window => "I have been placed through RJS")
+	end
+
+Here, I first bind the Ruby <tt>@map</tt> variable to the JS variable <tt>map</tt>, which already exists in the client browser. +map+ is by default the name given to a map created from YM4R/GM (this could be overriden by passing a second argument to the GMap constructor). Then I create a marker.
+
+And you would have inside the RJS template for the action:
+	page << @map.clear_overlays
+	page << @map.add_overlay(@marker)
+
+Here I first clear the map of all overlays. Then I add the marker. Note that the +overlay_init+ is not used anymore since, as its name indicates, this method is only for the initialization of the map.
+
 ==Relation between the YM4R gem and the YM4R/GM plugin
 They are completely independent from each other.
 
@@ -17,7 +59,7 @@ As part of the installation procedure, the JavaScript files found in the <tt>PLU
 
 Moreover a <tt>gmaps_api_key.yml</tt> file will also be created in the <tt>RAILS_ROOT/config/</tt> folder. If this file already exists (installed for example by a previous version of the plugin), nothing will be done to it, so you can keep your configuration data even after updating the plugin. This file is a YAML representation of a hash, similar to the <tt>database.yml</tt> file in that the primary keys in the file are the different environments (development, test, production), since you will probably need to have different Google Maps API keys depending on that criteria (for example: a key for localhost for development and test; a key for your host for production). If you don't have any special need, there will be only one key associated with each environment. If however, you need to have multiple keys (for example if your app will be accessible from multiple URLs, for which you need different keys), you can also associate a hash to the environment, whose keys will be the different hosts. In this case, you will need to pass a value to the <tt>:host</tt> key when calling the method <tt>GMap.header</tt> (usually <tt>@request.host</tt>).
 
-==Migration from the YM4R gem
+==Migration from the YM4R gem versions <= 0.4.1
 Apart from the installation of the plugin detailed above, you will also need to delete the instructions to require the file and include the Ym4r::GoogleMaps module in your controllers:
 	require 'ym4r'
 	include Ym4r::GoogleMaps
