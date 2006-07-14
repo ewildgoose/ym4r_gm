@@ -172,10 +172,10 @@ module Ym4r
       attr_accessor :url, :proxy, :icon, :options
       
       #You can pass the following options:
-      #- <tt>:icon</tt>: An icon for the items of the feed. Defaults to the class red ballon icon.
-      #- <tt>:proxy</tt>: An URL on your server which will take care of fetching the RSS feed.
+      #- <tt>:icon</tt>: An icon for the items of the feed. Defaults to the classic red balloon icon.
+      #- <tt>:proxy</tt>: An URL on your server where fetching the RSS feed will be taken care of.
       #- <tt>:list_div</tt>: In case you want a list of all the markers, with a link on which you can click in order to display the info on the marker, use this option to indicate the ID of the div (that you must place yourself).
-      #- <tt>:list_item_class<tt>: class of the DIV containing each item of the list. Ignored if option <tt>:list_div</tt> is not set.
+      #- <tt>:list_item_class</tt>: class of the DIV containing each item of the list. Ignored if option <tt>:list_div</tt> is not set.
       #- <tt>:limit</tt>: Maximum number of items to display on the map.
       #- <tt>:content_div</tt>: Instead of having an info window appear, indicates the ID of the DIV where this info should be displayed.
       def initialize(url, options = {})

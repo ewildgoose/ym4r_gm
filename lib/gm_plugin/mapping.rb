@@ -12,7 +12,7 @@ module Ym4r
           if args.length != 1
             raise ArgumentError("Only 1 argument is allowed on on_ methods");
           else
-            Variable.new("GEvent.addListener(#{to_javascript},\"#{javascriptify_method($1)}\",#{args[0]})")
+            Variable.new("GEvent.addListener(#{to_javascript},\"#{MappingObject.javascriptify_method($1)}\",#{args[0]})")
           end
         else
           args.collect! do |arg|
