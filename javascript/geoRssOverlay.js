@@ -18,6 +18,10 @@ function GeoRssOverlay(rssurl,icon,proxyurl,options){
     this.rssurl = rssurl;
     this.icon = icon;
     this.proxyurl = proxyurl;
+    if(options['visible'] == undefined)
+	this.visible = true;
+    else
+	this.visible = options['visible'];
     this.listDiv = options['listDiv']; //ID of the item list DIV
     this.contentDiv = options['contentDiv']; //ID of the content DIV
     this.listItemClass = options['listItemClass']; //Class of the list item DIV
@@ -40,6 +44,20 @@ GeoRssOverlay.prototype.redraw = function(force){
 GeoRssOverlay.prototype.remove = function(){
     for(var i= 0, len = this.markers.length ; i< len; i++){
 	this.map.removeOverlay(this.markers[i]);
+    }
+}
+
+GeoRssOverlay.prototype.showHide=function() {
+    if (this.visible) {
+	for (var i=0;i<this.markers.length;i++) {
+	    this.map.removeOverlay(this.markers[i]);
+	}
+	this.visible = false;
+    } else {
+	for (var i=0;i<this.markers.length;i++) {
+	    this.map.addOverlay(this.markers[i]);
+	}
+	this.visible = true;
     }
 }
 
@@ -91,7 +109,9 @@ GeoRssOverlay.prototype.callback = function() {
 		try {
 		    var marker = this.createMarker(items[i],i);
 		    this.markers.push(marker);
-		    this.map.addOverlay(marker);
+		    if(this.visible){
+			this.map.addOverlay(marker);
+		    }
 		} catch (e) {
 		}
 	    }
