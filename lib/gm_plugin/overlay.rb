@@ -3,13 +3,16 @@ module Ym4r
     #A graphical marker positionned through geographic coordinates (in the WGS84 datum). An HTML info window can be set to be displayed when the marker is clicked on.
     class GMarker
       include MappingObject
-      attr_accessor :point, :options, :info_window, :info_window_tabs
+      attr_accessor :point, :options, :info_window, :info_window_tabs, :address
       #The +points+ argument can be either a GLatLng object or an array of 2 floats. The +options+ keys can be: <tt>:icon</tt>, <tt>:clickable</tt>, <tt>:title</tt>, <tt>:info_window</tt> and <tt>info_window_tabs</tt>. The value of the +info_window+ key is a string of HTML code that will be displayed when the markers is clicked on. The value of the +info_window_tabs+ key is an array of GInfoWindowTab objects.
-      def initialize(point, options = {})
-        if point.is_a?(Array)
-          @point = GLatLng.new(point)
+      def initialize(position, options = {})
+        if position.is_a?(Array)
+          @point = GLatLng.new(position)
+        elsif position.is_a?(String)
+          @point = Variable.new("INVISIBLE") #default coordinates: won't appear anyway
+          @address = position
         else
-          @point = point
+          @point = position
         end
         @info_window = options.delete(:info_window)
         @tab_info_window = options.delete(:info_window_tabs)
@@ -23,11 +26,14 @@ module Ym4r
           creation = "new GMarker(#{MappingObject.javascriptify_variable(@point)},#{MappingObject.javascriptify_variable(@options)})"
         end
         if @info_window
-          "addInfoWindowToMarker(#{creation},#{MappingObject.javascriptify_variable(@info_window)})"
+          creation = "addInfoWindowToMarker(#{creation},#{MappingObject.javascriptify_variable(@info_window)})"
         elsif @tab_info_window
-          "addInfoWindowTabsToMarker(#{creation},#{MappingObject.javascriptify_variable(Array(@tab_info_window))})"
-        else
+          creation = "addInfoWindowTabsToMarker(#{creation},#{MappingObject.javascriptify_variable(Array(@tab_info_window))})"
+        end
+        if @address.nil?
           creation
+        else
+          "addGeocodingToMarker(#{creation},#{MappingObject.javascriptify_variable(@address)})"
         end
       end
     end
@@ -102,9 +108,9 @@ module Ym4r
       end
       def create
         unless @unbounded
-          "new GLatLng(#{@lat},#{@lng})"
+          "new GLatLng(#{MappingObject.javascriptify_variable(@lat)},#{MappingObject.javascriptify_variable(@lng)})"
         else
-          "new GLatLng(#{@lat},#{@lng},#{@unbounded})"
+          "new GLatLng(#{MappingObject.javascriptify_variable(@lat)},#{MappingObject.javascriptify_variable(@lng)},#{MappingObject.javascriptify_variable(@unbounded)})"
         end
       end
     end
@@ -113,7 +119,7 @@ module Ym4r
     class GLatLngBounds < Struct.new(:sw,:ne)
       include MappingObject
       def create
-        "new GLatLngBounds(#{sw},#{ne})"
+        "new GLatLngBounds(#{MappingObject.javascriptify_variable(sw)},#{MappingObject.javascriptify_variable(ne)})"
       end
     end
     

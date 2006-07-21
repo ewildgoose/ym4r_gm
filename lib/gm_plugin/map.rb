@@ -76,6 +76,38 @@ module Ym4r
         @init_end << add_control(GMapTypeControl.new) if controls[:map_type]
         @init_end << add_control(GOverviewMapControl.new) if controls[:overview_map]
       end
+      
+      #Initializes the interface configuration: double-click zoom, dragging, continuous zoom,... You can pass a hash with keys <tt>:dragging</tt>, <tt>:info_window</tt>, <tt>:double_click_zoom</tt>, <tt>:continuous_zoom</tt>. The values should be true or false. Check the google maps API doc to know what the default values are.
+      def interface_init(interface = {})
+        if !interface[:dragging].nil?
+          if interface[:dragging]
+             @init << enableDragging() 
+          else
+            @init << disableDragging() 
+          end
+        end
+        if !interface[:info_window].nil?
+          if interface[:info_window]
+            @init << enableInfoWindow()
+          else
+            @init << disableInfoWindow()
+          end
+        end
+        if !interface[:double_click_zoom].nil?
+          if interface[:double_click_zoom]
+            @init << enableDoubleClickZoom()
+          else
+            @init << disableDoubleClickZoom()
+          end
+        end
+        if !interface[:continuous_zoom].nil?
+          if interface[:continuous_zoom]
+            @init << enableContinuousZoom()
+          else
+            @init << disableContinuousZoom()
+          end
+        end
+      end
 
       #Initializes the initial center and zoom of the map. +center+ can be both a GLatLng object or a 2-float array.
       def center_zoom_init(center, zoom)

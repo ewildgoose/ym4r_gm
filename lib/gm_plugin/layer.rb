@@ -78,14 +78,14 @@ module Ym4r
       
       #Returns the code to determine the url to fetch the tile. Follows the convention adopted by the tiler: {base_url}/tile_{b}_{a.x}_{a.y}.{format}
       def get_tile_url
-        "function(a,b,c) { return '#{@base_url}/tile_' + b + '_' + a.x + '_' + a.y + '.#{format}';}"
+        "function(a,b) { return '#{@base_url}/tile_' + b + '_' + a.x + '_' + a.y + '.#{format}';}"
       end 
     end
 
     #Represents a pretiled layer (it actually does not really matter where the tiles come from). Calls an action on the server to get back the tiles. It passes the action arguments x, y (coordinates of the tile) and z (zoom level). It can be used, for example, to return default tiles when the requested tile is not present.
     class PreTiledLayerFromAction < PreTiledLayer
       def get_tile_url
-        "function(a,b,c) { return '#{base_url}?x=' + a.x + '&y=' + a.y + '&z=' + b ;}"
+        "function(a,b) { return '#{base_url}?x=' + a.x + '&y=' + a.y + '&z=' + b ;}"
       end
     end
     

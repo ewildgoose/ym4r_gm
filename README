@@ -89,17 +89,23 @@ For example, here is a typical initialization sequence for a map
 While +center_zoom_init+, +control_init+ or +overlay_init+ (and generally all the GMap methods which end in +init+) are one of the rare convenience methods that do not output JavaScript, the +add_overlay+ does. Actually, if you look at the code of the GMap class, you won't find any +add_overlay+ method, although in the documentation of the GMap2 class from the Google Maps API documentation, you will find something about the +addOverlay+ JavaScript method. In fact, when you call on a mapping object an unknow method, it is converted to a javascriptified version of it, along with its arguments, and a string of JavaScript code is output. So the <tt>@map.add_overlay...</tt> above is converted to <tt>"map.addOverlay(new GMarker(GLatLng.new(35.12878, -110.578),{title:\"Hello!\"}))"</tt>, which is then passed to the +record_init+ method of a Ruby GMap object to be later output along with the rest of the initialization code. Any arbitrary JavaScript code can be passed to the +record_init+ method. Note that 2 last lines of the previous code sample are strictly equivalent and since the +overlay_init+ version is a bit simpler, it should be preferred.
 
 ===Initialization of the map
-The map is represented by a GMap object. You need to pass to the constructor the id of a DIV that will contain the map. You have to place this DIV yourself in your HTML template. You can also optionnally pass to the constructor the JavaScript name of the variable that will reference the map, which by default will be global in JavaScript. You have convenience methods to setup the controls, the center, the zoom, overlays, map types and the icons (which are also global). You can also pass arbitrary JavaScript to +record_init+ and +record_global_init+. Since, by default, the initialization of the map is performed in a callback function, if you want to have a globally accessible variable, you need to use the +global+ version.
+The map is represented by a GMap object. You need to pass to the constructor the id of a DIV that will contain the map. You have to place this DIV yourself in your HTML template. You can also optionnally pass to the constructor the JavaScript name of the variable that will reference the map, which by default will be global in JavaScript. You have convenience methods to setup the controls, the center, the zoom, overlays, the interface configuration (continous zoom, double click zoom, dragging), map types and the icons (which are also global). You can also pass arbitrary JavaScript to +record_init+ and +record_global_init+. Since, by default, the initialization of the map is performed in a callback function, if you want to have a globally accessible variable, you need to use the +global+ version.
 
 You can also have multiple maps. Just make sure you give them different DIV id's, as well as different global variable names, when constructing them:
 	@map1 = GMap("map1_div","map1")
 	@map2 = GMap("map2_div","map2")
 
+The other absolutely necessary initialization step in the controller is the setting of center and zoom:
+	@map1.center_zoom_init([49.12,-56.453],3)
+Withouth this code the map will display an empty grey rectangle with Google's logo. 
+
 Then in your template, you have 2 necessary calls:
 - The static <tt>GMap.header</tt>: Outputs the inclusion of the JavaScript file from Google to make use of the Google Maps API and by default a style declaration for VML objects, necessary to display polylines under IE. This default can be overriddent by passing <tt>:with_vml => false</tt> as option to the +header+ method. You can also pass to this method a <tt>:host</tt> option in order to select the correct key for the location where your app is currently deployed, in case the current environment has multiple possible keys. Usually, in this case, you should pass it <tt>@request.host</tt>. Finally you can override all the key settings in the configuration by passing a value to the <tt>:key</tt> key.
 - <tt>GMap#to_html</tt>: Outputs the initialization code of the map. By default, it outputs the +script+ tags and initializes the map in response to the onload event of the JavaScript window object. You can call +to_html+ on each one of your maps to have them all initialized.
 
-So you should have the following:
+You can also use <tt>GMap#div</tt> to output the div element with the correct +id+. You can pass it options <tt>:height</Tt> and <tt>:width</tt> to set the size of the div (although, as indicated below, you have other ways to do that).
+
+So you should have something like the following:
 	<html><head><title>Hello</title>
 	<%= GMap.header %>
 	<%= @map.to_html %>
@@ -111,6 +117,16 @@ So you should have the following:
 - You define it yourself, wherever you want. Usually as part of the layout definition in an external CSS.
 - In the head of the document, through a CSS instruction output by <tt>@map.header_width_height</tt>, to which you pass 2 arguments (width and height).
 - When outputting the DIV with <tt>@map.div</tt>, you can also pass an option hash, with keys <tt>:width</tt> and <tt>:height</tt> and a style attribute for the DIV element will be output.
+
+===GMarkers
+You can give a position to the GMarker constructor either by passing an 2D-array of coordinates, a GLatLng object, an object of type Variable (which evaluates to a GLatLng when interpreted in the browser) or an address, which will be geocoded when the marker is initialized by the map.
+
+You can pass options to the GMarker 
+
+For example:
+	GMarker.new([12.4,65.6])
+	GMarker.new("Rue Clovis Paris")
+	
 
 ===Update of the map
 You are able to update the map through Ajax. For example, in Ruby-on-Rails, you have something called RJS, which sends JavaScript created on the server as a response to an action, which is later interpreted by the browser. It is usually used for visual effects and replacing or adding elements. It can also accept arbitrary JavaScript and this is what YM4R uses.
@@ -282,12 +298,12 @@ If you want to setup the map as the default one when the map is initially displa
 Future versions of the plugin may simplify that.
 
 ==Changes since the last version
-- Repackaging of the Google Maps related functionalities of YM4R into this Rails plugin
-- Changed the way to pass options to the GTileLayer (and related classes) constructor. Now it uses an option hash.
-- Addition of support for the GeoRss Simple format in the GeoRssOverlay class.
 - Support of multiple maps
+- Addition of an +interface_init+ method to GMap to configure the interface: Continuous zoom, double click zoom, enabling dragging,...
+- GMarker can now be placed by address (in addition to coordinates). Some code to geocode the address when the marker is initialized is added
 
 ==TODO
+- Put back the Google geocoding into the plugin, as requested by a few people
 - Add support for easy manipulation of external Google Maps-related libraries: Advanced tooltip manipulation,...
 - Addition of all GeoRss vocabularies (with all features: polylines...) to the geoRssOverlay extension
 - Tutorials

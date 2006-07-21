@@ -36,4 +36,24 @@ function addCodeToFunction(func,code){
     }
 }
 
+function addGeocodingToMarker(marker,address){
+    marker.orig_initialize = marker.initialize;
+    orig_redraw = marker.redraw;
+    marker.redraw = function(force){}; //empty the redraw method so no error when called by addOverlay.
+    marker.initialize = function(map){
+	new GClientGeocoder().getLatLng(address,
+					function(latlng){
+	    if(latlng){
+		marker.redraw = orig_redraw;
+		marker.orig_initialize(map); //init before setting point
+		marker.setPoint(latlng);
+	    }//do nothing
+	});
+    };
+    return marker;
+}
+
+
+
+var INVISIBLE = new GLatLng(0,0); //This point doesn't matter
 window.onunload = GUnload;
