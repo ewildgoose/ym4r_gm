@@ -95,8 +95,20 @@ GMarkerGroup.prototype.activate = function(active){
     }
 }
 
+GMarkerGroup.prototype.centerAndZoomOnMarkers = function() {
+    if(this.map != undefined){
+	//merge markers and markersById
+	var tmpMarkers = this.markers.slice();
+	for (var id in this.markersById){
+	    tmpMarkers.push(this.markersById[id]);
+	}
+	if(tmpMarkers.length > 0){
+    	    this.map.centerAndZoomOnMarkers(tmpMarkers);
+	} 
+    }
+}	
+
 //Deactivate the Group Overlay (convenience method)
 GMarkerGroup.prototype.deactivate = function(){
     this.activate(false);
 }
-

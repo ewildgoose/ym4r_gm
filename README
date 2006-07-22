@@ -119,22 +119,23 @@ So you should have something like the following:
 - When outputting the DIV with <tt>@map.div</tt>, you can also pass an option hash, with keys <tt>:width</tt> and <tt>:height</tt> and a style attribute for the DIV element will be output.
 
 ===GMarkers
-You can give a position to the GMarker constructor either by passing an 2D-array of coordinates, a GLatLng object, an object of type Variable (which evaluates to a GLatLng when interpreted in the browser) or an address, which will be geocoded when the marker is initialized by the map.
+GMarkers are point of interests on a map. You can give a position to a GMarker constructor either by passing it a 2D-array of coordinates, a GLatLng object, an object of type Variable (which evaluates to a GLatLng when interpreted in the browser) or an address, which will be geocoded when the marker is initialized by the map.
 
-You can pass options to the GMarker 
+You can pass options to the GMarker to customize the info window (<tt>:info_window</tt> or <tt>:info_window_tabs</tt> options), the tooltip (<tt>:title</tt> option) or the icon used (<tt>:icon</tt> option).
 
 For example:
-	GMarker.new([12.4,65.6])
-	GMarker.new("Rue Clovis Paris")
+	GMarker.new([12.4,65.6],:info_window => "<b>I'm a Popup window</b>",:title => "Tooltip")
+	GMarker.new(GLatLng.new([12.3,45.6]))
+	GMarker.new("Rue Clovis Paris France", :title => "geocoded")
 	
 
 ===Update of the map
-You are able to update the map through Ajax. For example, in Ruby-on-Rails, you have something called RJS, which sends JavaScript created on the server as a response to an action, which is later interpreted by the browser. It is usually used for visual effects and replacing or adding elements. It can also accept arbitrary JavaScript and this is what YM4R uses.
+You are able to update the map through Ajax. In Ruby-on-Rails, you have something called RJS, which sends JavaScript created on the server as a response to an action, which is later interpreted by the browser. It is usually used for visual effects and replacing or adding elements. It can also accept arbitrary JavaScript and this is what YM4R uses.
 
 For example, if you want to add a marker to the map, you need to do a few things. First, you have to bind a Ruby mapping object to the global JavaScript map variable. By default its name is +map+, but you could have overriden that at initialization time. You need to do something like this:
 	@map = Variable.new("map")
 +map+ in the Variable constructor is the name of the global JavaScript map variable. Then any method you call on <tt>@map</tt> will be converted in JavaScript to a method called on +map+. In your RJS code, you would do something like this to add a marker:
-	page << @map.add_overlay(GMarker.new([123123.1,12313.76],:title => "Hello again!"))
+	page << @map.add_overlay(GMarker.new([12.1,12.76],:title => "Hello again!"))
 What is sent to the browser will be the fllowing JavaScript code:
 	map.addOverlay(new GMarker(new GLatLng(123123.1,12313.76),{title:\"Hello again!\"}))
 
@@ -164,6 +165,9 @@ Then in your template, you could have that:
 When you click on one of the links, the corresponding marker has its info window displayed.
 
 You can call +activate+ and +deactivate+ to display or undisplay a group of markers. You can add new markers with <tt>addMarker(marker,id)</tt>. Again if you don't care about referencing the marker, you don't need to pass an id. If the marker group is active, the newly added marker will be displayed immediately. Otherwise it will be displayed the next time the group is activated. Finally, since it is an overlay, the group will be removed when calling clearOverlays on the GMap object.
+
+You can center and zoom on all the markers in the group by calling <tt>GMarkerGroup#centerAndZoomOnMarkers()</tt> after the group has been added to a map. So for example, if you would want to do that at initalization time, you would do the following (assuming your marker group has been declared as +group+):
+	@map.record_init group.center_and_zoom_on_markers
 
 ===Clusterer
 A Clusterer is a type of overlay that contains a potentially very large group of markers. It is engineered so markers close to each other and undistinguishable from each other at some level of zoom, appear as only one marker on the map at that level of zoom. Therefore it is possible to have a very large number of markers on the map at the same time and not having the map crawl to a halt in order to display them. It has been slightly modified from Jef Poskanzer's original Clusterer2 code (see http://www.acme.com/javascript/ for the original version). The major difference with that version is that, in YM4R, the clusterer is a GOverlay and can therefore be added to the map with <tt>map.addOverlay(clusterer)</tt> and is cleared along with the rest of overlays when <tt>map.clearOverlays()</tt> is called.
@@ -297,14 +301,32 @@ If you want to setup the map as the default one when the map is initially displa
 	@map.set_map_type_init(map_type)
 Future versions of the plugin may simplify that.
 
-==Changes since the last version
+===Google Geocoding
+A helper to perform geocoding on the server side (in Ruby) is included. Here is an example of request:
+	results = Geocoding::get("Rue Clovis Paris")
+You can also pass to the +get+ method an options hash to manage the various API key options (see the section on <tt>GMap.header</tt> for details). +results+ is an array of Geocoding::Placemark objects, with 2 additional attributes: +status+ and +name+. You should check if +status+ equals <tt>Geocoding::GEO_SUCCESS</tt> to know if the request has been successful. You can then access the various data elements.
+
+Here is an example that will display a marker on Paris:
+	results = Geocoding::get("Rue Clovis Paris")
+	if results.status == Geocoding::GEO_SUCCESS
+		coord = results[0].latlon
+		@map.overlay_init(GMarker.new(coord,:info_window => "Rue Clovis Paris"))
+	end
+
+You could also have performed the geocoding on the client side with the following code, which is functionnality equivalent to the code above:
+	GMarker.new("Rue Clovis Paris",:info_window => "Rue Clovis Paris")
+
+
+==Recent changes
 - Support of multiple maps
+- Put back the Google geocoding into the plugin, as requested by a few people. Its module is included with the rest of the plugin.
 - Addition of an +interface_init+ method to GMap to configure the interface: Continuous zoom, double click zoom, enabling dragging,...
 - GMarker can now be placed by address (in addition to coordinates). Some code to geocode the address when the marker is initialized is added
+- Addition of a +center_zoom_on_points_init+ to center and zoom on a group of pixel
+- In JS, addition of methods to GMap2 and GMarkerGroup to center and zoom on a group of points or markers (thanks to Glen Barnes)
 
 ==TODO
-- Put back the Google geocoding into the plugin, as requested by a few people
-- Add support for easy manipulation of external Google Maps-related libraries: Advanced tooltip manipulation,...
+- Add support for easy manipulation of external Google Maps-related libraries: Advanced tooltip manipulation (PdMarker),...
 - Addition of all GeoRss vocabularies (with all features: polylines...) to the geoRssOverlay extension
 - Tutorials
 

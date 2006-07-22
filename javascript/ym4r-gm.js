@@ -53,7 +53,29 @@ function addGeocodingToMarker(marker,address){
     return marker;
 }
 
+GMap2.prototype.centerAndZoomOnMarkers = function(markers) {
+     var bounds = new GLatLngBounds(markers[0].getPoint(),
+				    markers[0].getPoint());
+     for (var i=1, len = markers.length ; i<len; i++) {
+	 bounds.extend(markers[i].getPoint());
+     }
+     
+     var center = bounds.getCenter();
+     this.setCenter(center, this.getBoundsZoomLevel(bounds));
+ } 
+
+GMap2.prototype.centerAndZoomOnPoints = function(points) {
+     var bounds = new GLatLngBounds(points[0],
+				    points[0]);
+     for (var i=1, len = points.length ; i<len; i++) {
+	 bounds.extend(points[i]);
+     }
+     
+     var center = bounds.getCenter();
+     this.setCenter(center, this.getBoundsZoomLevel(bounds));
+ } 
 
 
-var INVISIBLE = new GLatLng(0,0); //This point doesn't matter
+
+var INVISIBLE = new GLatLng(0,0); //almost always invisible
 window.onunload = GUnload;

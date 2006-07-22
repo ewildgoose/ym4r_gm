@@ -28,20 +28,7 @@ module Ym4r
       #Outputs the header necessary to use the Google Maps API, by including the JS files of the API, as well as a file containing YM4R/GM helper functions. By default, it also outputs a style declaration for VML elements. This default can be overriddent by passing <tt>:with_vml => false</tt> as option to the method. You can also pass a <tt>:host</tt> option in order to select the correct API key for the location where your app is currently running, in case the current environment has multiple possible keys. Usually, in this case, you should pass it <tt>@request.host</tt>. If you have defined only one API key for the current environment, the <tt>:host</tt> option is ignored. Finally you can override all the key settings in the configuration by passing a value to the <tt>:key</tt> key.
       def self.header(options = {})
         options[:with_vml] = true unless options.has_key?(:with_vml)
-        if options.has_key?(:key)
-          api_key = options[:key]
-        elsif GMAPS_API_KEY.is_a?(Hash)
-          #For this environment, multiple hosts are possible.
-          #:host must have been passed as option
-          if options.has_key?(:host)
-            api_key = GMAPS_API_KEY[options[:host]]
-          else
-            raise AmbiguousGMapsAPIKeyException.new(GMAPS_API_KEY.keys.join(","))
-          end
-        else
-          #Only one possible key: take it
-          api_key = GMAPS_API_KEY
-        end
+        api_key = ApiKey.get(options)
         a = "<script src=\"http://maps.google.com/maps?file=api&v=2&key=#{api_key}\" type=\"text/javascript\"></script>\n"
         a << "<script src=\"/javascripts/ym4r-gm.js\" type=\"text/javascript\"></script>\n"
         a << "<style type=\"text/css\">\n v\:* { behavior:url(#default#VML);}\n</style>" if options[:with_vml]
@@ -115,6 +102,16 @@ module Ym4r
           @init_begin << set_center(center,zoom)
         else
           @init_begin << set_center(GLatLng.new(center),zoom)
+        end
+      end
+
+      #Center and zoom based on the coordinates passed as argument (either 2D arrays or GLatLng objects)
+      def center_zoom_on_points_init(*points)
+        if(points.length > 0)
+          if(points[0].is_a?(Array))
+            points = points.collect { |point| GLatLng.new(point) }
+          end
+          @init_begin << center_and_zoom_on_points(points)
         end
       end
 
@@ -200,10 +197,6 @@ module Ym4r
         "new GMap2(document.getElementById(\"#{@container}\"))"
       end
     end
-
-    class AmbiguousGMapsAPIKeyException < StandardError
-    end
-
   end
 end
 
