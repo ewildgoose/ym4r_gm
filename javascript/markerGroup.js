@@ -45,7 +45,7 @@ GMarkerGroup.prototype.clear = function(){
     this.markersById = new Object();
 }
 
-//Add a marker to the GMarkerGroup ; Adds it now to the map if the GMarkerGroup is active ; Should only be used AFTER the group overlay has been added to the map
+//Add a marker to the GMarkerGroup ; Adds it now to the map if the GMarkerGroup is active
 GMarkerGroup.prototype.addMarker = function(marker,id){
     if(id == undefined){
 	this.markers.push(marker);

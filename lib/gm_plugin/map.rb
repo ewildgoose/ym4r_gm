@@ -115,6 +115,20 @@ module Ym4r
         end
       end
 
+      #Center and zoom based on the bbox corners. Pass a GLatLngBounds object, an array of 2D coordinates (sw and ne) or an array of GLatLng objects (sw and ne).
+      def center_zoom_on_bounds_init(latlngbounds)
+        if(latlngbounds.is_a?(Array))
+          if latlngbounds[0].is_a?(Array)
+            latlngbounds = GLatLngBounds.new(GLatLng.new(latlngbounds[0]),GLatLng.new(latlngbounds[1]))
+          elsif latlngbounds[0].is_a?(GLatLng)
+            latlngbounds = GLatLngBounds.new(*latlngbounds)
+          end
+        end
+        #else it is already a latlngbounds object
+
+        @init_begin << center_and_zoom_on_bounds(latlngbounds)
+      end
+
       #Initializes the map by adding an overlay (marker or polyline).
       def overlay_init(overlay)
         @init << add_overlay(overlay)

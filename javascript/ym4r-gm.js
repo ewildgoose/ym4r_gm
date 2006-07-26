@@ -60,8 +60,7 @@ GMap2.prototype.centerAndZoomOnMarkers = function(markers) {
 	 bounds.extend(markers[i].getPoint());
      }
      
-     var center = bounds.getCenter();
-     this.setCenter(center, this.getBoundsZoomLevel(bounds));
+     this.centerAndZoomOnBounds(bounds);
  } 
 
 GMap2.prototype.centerAndZoomOnPoints = function(points) {
@@ -71,10 +70,13 @@ GMap2.prototype.centerAndZoomOnPoints = function(points) {
 	 bounds.extend(points[i]);
      }
      
-     var center = bounds.getCenter();
-     this.setCenter(center, this.getBoundsZoomLevel(bounds));
+     this.centerAndZoomOnBounds(bounds);
  } 
 
+GMap2.prototype.centerAndZoomOnBounds = function(bounds) {
+    var center = bounds.getCenter();
+    this.setCenter(center, this.getBoundsZoomLevel(bounds));
+} 
 
 
 var INVISIBLE = new GLatLng(0,0); //almost always invisible
