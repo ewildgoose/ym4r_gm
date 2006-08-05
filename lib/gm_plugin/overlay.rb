@@ -28,7 +28,7 @@ module Ym4r
         if @info_window
           creation = "addInfoWindowToMarker(#{creation},#{MappingObject.javascriptify_variable(@info_window)})"
         elsif @info_window_tabs
-          creation = "addInfoWindowTabsToMarker(#{creation},#{MappingObject.javascriptify_variable(Array(@tab_info_window))})"
+          creation = "addInfoWindowTabsToMarker(#{creation},#{MappingObject.javascriptify_variable(Array(@info_window_tabs))})"
         end
         if @address.nil?
           creation
