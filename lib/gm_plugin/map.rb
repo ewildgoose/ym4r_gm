@@ -39,7 +39,7 @@ module Ym4r
       def div(options = {})
         attributes = "id=\"#{@container}\" "
         if options.has_key?(:height) && options.has_key?(:width)
-          attributes += "style=\"width:#{options[:width]};height:#{options[:height]}\""
+          attributes += "style=\"width:#{options[:width]}px;height:#{options[:height]}px\""
         end
         "<div #{attributes}></div>"
       end
