@@ -161,7 +161,7 @@ Here I have created an active (ie which is going to be displayed when the map is
 Then in your template, you could have that:
 	<a href="#" onclick="myGroup.showMarker(1);return false;">Click here to display marker1</a>
 	<a href="#" onclick="myGroup.showMarker(2);return false;">Click here to display marker2</a>
-	<%= @map.to_div %>
+	<%= @map.div %>
 When you click on one of the links, the corresponding marker has its info window displayed.
 
 You can call +activate+ and +deactivate+ to display or undisplay a group of markers. You can add new markers with <tt>addMarker(marker,id)</tt>. Again if you don't care about referencing the marker, you don't need to pass an id. If the marker group is active, the newly added marker will be displayed immediately. Otherwise it will be displayed the next time the group is activated. Finally, since it is an overlay, the group will be removed when calling clearOverlays on the GMap object.
