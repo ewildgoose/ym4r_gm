@@ -4,7 +4,7 @@ module Ym4r
     class GMarker
       include MappingObject
       attr_accessor :point, :options, :info_window, :info_window_tabs, :address
-      #The +points+ argument can be either a GLatLng object or an array of 2 floats. The +options+ keys can be: <tt>:icon</tt>, <tt>:clickable</tt>, <tt>:title</tt>, <tt>:info_window</tt> and <tt>:info_window_tabs</tt>. The value of the +info_window+ key is a string of HTML code that will be displayed when the markers is clicked on. The value of the +info_window_tabs+ key is an array of GInfoWindowTab objects.
+      #The +points+ argument can be either a GLatLng object or an array of 2 floats. The +options+ keys can be: <tt>:icon</tt>, <tt>:clickable</tt>, <tt>:title</tt>, <tt>:info_window</tt> and <tt>:info_window_tabs</tt>. The value of the +info_window+ key is a string of HTML code that will be displayed when the markers is clicked on. The value of the +info_window_tabs+ key is an array of GInfoWindowTab objects or a hash directly, in which case it will be transformed to an array of GInfoWindowTabs, with the keys as the tab headers and the values as the content.
       def initialize(position, options = {})
         if position.is_a?(Array)
           @point = GLatLng.new(position)
@@ -25,9 +25,11 @@ module Ym4r
         else
           creation = "new GMarker(#{MappingObject.javascriptify_variable(@point)},#{MappingObject.javascriptify_variable(@options)})"
         end
-        if @info_window
+        if @info_window && @info_window.is_a?(String)
           creation = "addInfoWindowToMarker(#{creation},#{MappingObject.javascriptify_variable(@info_window)})"
-        elsif @info_window_tabs
+        elsif @info_window_tabs && @info_window_tabs.is_a?(Hash)
+          creation = "addInfoWindowTabsToMarker(#{creation},#{MappingObject.javascriptify_variable(@info_window_tabs.to_a.collect{|kv| GInfoWindowTab.new(kv[0],kv[1] ) })})"
+        elsif @info_window_tabs 
           creation = "addInfoWindowTabsToMarker(#{creation},#{MappingObject.javascriptify_variable(Array(@info_window_tabs))})"
         end
         if @address.nil?
@@ -89,7 +91,7 @@ module Ym4r
       end
       #Creates a new polyline.
       def create
-        a = "new GPolyline([#{@points.collect{|pt| MappingObject.javascriptify_variable(pt)}.join(",")}]"
+        a = "new GPolyline(#{MappingObject.javascriptify_variable(points)}"
         a << ",#{MappingObject.javascriptify_variable(@color)}" if @color
         a << ",#{MappingObject.javascriptify_variable(@weight)}" if @weight
         a << ",#{MappingObject.javascriptify_variable(@opacity)}" if @opacity

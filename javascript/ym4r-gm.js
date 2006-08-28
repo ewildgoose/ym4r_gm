@@ -53,6 +53,8 @@ function addGeocodingToMarker(marker,address){
     return marker;
 }
 
+
+
 GMap2.prototype.centerAndZoomOnMarkers = function(markers) {
      var bounds = new GLatLngBounds(markers[0].getPoint(),
 				    markers[0].getPoint());
@@ -78,6 +80,16 @@ GMap2.prototype.centerAndZoomOnBounds = function(bounds) {
     this.setCenter(center, this.getBoundsZoomLevel(bounds));
 } 
 
+//For full screen mode
+function setWindowDims(elem) {
+    if (window.innerWidth){
+	elem.style.height = (window.innerHeight) + 'px;';
+	elem.style.width = (window.innerWidth) + 'px;';
+    }else if (document.body.clientWidth){
+	elem.style.width = (document.body.clientWidth) + 'px';
+	elem.style.height = (document.body.clientHeight) + 'px';
+    }
+}
 
 var INVISIBLE = new GLatLng(0,0); //almost always invisible
 window.onunload = GUnload;
