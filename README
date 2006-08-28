@@ -101,7 +101,7 @@ Withouth this code the map will display an empty grey rectangle with Google's lo
 
 Then in your template, you have 2 necessary calls:
 - The static <tt>GMap.header</tt>: Outputs the inclusion of the JavaScript file from Google to make use of the Google Maps API and by default a style declaration for VML objects, necessary to display polylines under IE. This default can be overriddent by passing <tt>:with_vml => false</tt> as option to the +header+ method. You can also pass to this method a <tt>:host</tt> option in order to select the correct key for the location where your app is currently deployed, in case the current environment has multiple possible keys. Usually, in this case, you should pass it <tt>@request.host</tt>. Finally you can override all the key settings in the configuration by passing a value to the <tt>:key</tt> key.
-- <tt>GMap#to_html</tt>: Outputs the initialization code of the map. By default, it outputs the +script+ tags and initializes the map in response to the onload event of the JavaScript window object. You can call +to_html+ on each one of your maps to have them all initialized.
+- <tt>GMap#to_html</tt>: Outputs the initialization code of the map. By default, it outputs the +script+ tags and initializes the map in response to the onload event of the JavaScript window object. You can call +to_html+ on each one of your maps to have them all initialized. You can pass the option <tt>:full=>true</tt> to the method to setup a fullscreen map, which will also be resized when the window size changes.
 
 You can also use <tt>GMap#div</tt> to output the div element with the correct +id+. You can pass it options <tt>:height</Tt> and <tt>:width</tt> to set the size of the div (although, as indicated below, you have other ways to do that).
 
@@ -318,12 +318,10 @@ You could also have performed the geocoding on the client side with the followin
 
 
 ==Recent changes
-- Support of multiple maps
-- Put back the Google geocoding into the plugin, as requested by a few people. Its module is included with the rest of the plugin.
-- Addition of an +interface_init+ method to GMap to configure the interface: Continuous zoom, double click zoom, enabling dragging,...
 - GMarker can now be placed by address (in addition to coordinates). Some code to geocode the address when the marker is initialized is added
 - Addition of a +center_zoom_on_points_init+ to center and zoom on a group of pixel
 - In JS, addition of methods to GMap2 and GMarkerGroup to center and zoom on a group of points or markers (thanks to Glen Barnes)
+- Support for easy setup of fullscreen maps
 
 ==TODO
 - Add support for easy manipulation of external Google Maps-related libraries: Advanced tooltip manipulation (PdMarker),...
