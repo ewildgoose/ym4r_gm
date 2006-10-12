@@ -168,6 +168,16 @@ module Ym4r
       def icon_global_init(icon , name)
         declare_global_init(icon,name)
       end
+
+      #Registers an event
+      def event_init(object,event,callback)
+        @init << "GEvent.addListener(#{object.to_javascript},\"#{MappingObject.javascriptify_method(event.to_s)}\",#{callback});"
+      end
+
+      #Registers an event globally
+      def event_global_init(object,event,callback)
+        @global_init << "GEvent.addListener(#{object.to_javascript},\"#{MappingObject.javascriptify_method(event.to_s)}\",#{callback});"
+      end
       
       #Declares the overlay globally with name +name+
       def overlay_global_init(overlay,name)
