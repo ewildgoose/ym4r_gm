@@ -1,12 +1,12 @@
 // JS helper functions for YM4R
 
-function addInfoWindowToMarker(marker,info){
-	GEvent.addListener(marker, "click", function() {marker.openInfoWindowHtml(info);});
+function addInfoWindowToMarker(marker,info,options){
+	GEvent.addListener(marker, "click", function() {marker.openInfoWindowHtml(info,options);});
 	return marker;
 }
 
-function addInfoWindowTabsToMarker(marker,info){
-     GEvent.addListener(marker, "click", function() {marker.openInfoWindowTabsHtml(info);});
+function addInfoWindowTabsToMarker(marker,info,options){
+     GEvent.addListener(marker, "click", function() {marker.openInfoWindowTabsHtml(info,options);});
      return marker;
 }
 
