@@ -46,7 +46,7 @@ module Ym4r
       
       #Escape string to be used in JavaScript. Lifted from rails.
       def self.escape_javascript(javascript)
-        javascript.gsub(/\r\n|\n|\r/, "\\n").gsub(/["']/) { |m| "\\#{m}" }
+        javascript.gsub(/\r\n|\n|\r/, "\\n").gsub("\"") { |m| "\\#{m}" }
       end
       
       #Transform a ruby-type method name (like add_overlay) to a JavaScript-style one (like addOverlay).
