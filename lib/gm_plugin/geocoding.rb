@@ -17,7 +17,7 @@ module Ym4r
       def self.get(request,options = {})
         api_key = ApiKey.get(options)
         
-        url = "http://maps.google.com/maps/geo?q=#{URI.encode(request)}&key=#{api_key}&output=xml"
+        url = "http://maps.google.com/maps/geo?q=#{URI.encode(request)}&key=#{api_key}&output=kml"
         xml = open(url).read
                 
         doc = REXML::Document.new(xml) 
