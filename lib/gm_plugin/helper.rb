@@ -20,3 +20,14 @@ Ym4r::GmPlugin::GLatLng.class_eval do
   end
 end
 
+Ym4r::GmPlugin::GPolygon.class_eval do
+  #Creates a GPolygon object from a georuby polygon or line string. Assumes the points of the line strings are stored in Longitude(x)/Latitude(y) order.
+  def self.from_georuby(ls_or_p, stroke_color="#000000",stroke_weight=1,stroke_opacity=1.0,color="#ff0000",opacity=1.0)
+    if ls_or_p.is_a?(GeoRuby::SimpleFeatures::LineString)
+      GPolygon.new(ls_or_p.collect { |point| GLatLng.new([point.y,point.x])},stroke_color,stroke_weight,stroke_opacity,color,opacity)
+    else
+      GPolygon.new(ls_or_p[0].collect { |point| GLatLng.new([point.y,point.x])},stroke_color,stroke_weight,stroke_opacity,color,opacity)
+    end
+  end
+end
+

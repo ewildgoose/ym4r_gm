@@ -39,6 +39,8 @@ module Ym4r
           "{" + arg.to_a.collect do |v|
             "#{MappingObject.javascriptify_method(v[0].to_s)} : #{MappingObject.javascriptify_variable(v[1])}"
           end.join(",") + "}"
+        elsif arg.nil?
+          "undefined"
         else
           arg.to_s
         end

@@ -129,6 +129,38 @@ module Ym4r
         "new GLatLngBounds(#{MappingObject.javascriptify_variable(sw)},#{MappingObject.javascriptify_variable(ne)})"
       end
     end
+
+    #Polygon. Not documented yet in the Google Maps API
+    class GPolygon
+      include MappingObject
+      
+      attr_accessor :points,:stroke_color,:stroke_weight,:stroke_opacity,:color,:opacity
+      
+      #Can take an array of +GLatLng+ or an array of 2D arrays. A method to directly build a polygon from a GeoRuby polygon is provided in the helper.rb file.
+      def initialize(points,stroke_color="#000000",stroke_weight=1,stroke_opacity=1.0,color="#ff0000",opacity=1.0)
+        if !points.empty? and points[0].is_a?(Array)
+          @points = points.collect { |pt| GLatLng.new(pt) }
+        else
+          @points = points
+        end
+        @stroke_color = stroke_color
+        @stroke_weight = stroke_weight
+        @stroke_opacity = stroke_opacity
+        @color = color
+        @opacity = opacity
+      end
+      
+      #Creates a new polyline.
+      def create
+        a = "new GPolygon(#{MappingObject.javascriptify_variable(points)}"
+        a << ",#{MappingObject.javascriptify_variable(@stroke_color)}"
+        a << ",#{MappingObject.javascriptify_variable(@stroke_weight)}"
+        a << ",#{MappingObject.javascriptify_variable(@stroke_opacity)}"
+        a << ",#{MappingObject.javascriptify_variable(@color)}"
+        a << ",#{MappingObject.javascriptify_variable(@opacity)}"
+        a << ")"
+      end
+    end
     
     #A GOverlay representing a group of GMarkers. The GMarkers can be identified with an id, which can be used to show the info window of a specific marker, in reponse, for example, to a click on a link. The whole group can be shown on and off at once. It should be declared global at initialization time to be useful.
     class GMarkerGroup
