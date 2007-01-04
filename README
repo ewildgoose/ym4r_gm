@@ -141,7 +141,7 @@ What is sent to the browser will be the fllowing JavaScript code:
 
 
 ===GPolyline
-GPolylines are colored lines on the map. The constructor takes as argument a list of GLatLng or a list of 2-element arrays, which will be transformed into GLatLng for you. It can also take the color (in the #rrggbb form), the weight (an integer) and the opacity. These arguments are optional though.
+GPolylines are colored lines on the map. The constructor takes as argument a list of GLatLng or a list of 2-element arrays, which will be transformed into GLatLng for you. It can also take the color (in the <tt>#rrggbb</tt> form), the weight (an integer) and the opacity. These arguments are optional though.
 
 For example:
 	GPolyline.new([[12.4,65.6],[4.5,61.2]],"#ff0000",3,1.0)
@@ -152,10 +152,10 @@ Then you add it like any other overlay:
 ===GPolygon
 GPolygons are colored areas on the map. As of 29/12, this feature is not documented in the official GMaps API, but thanks to Steven Talcott Smith (http://www.talcottsystems.com), it is possible to use it now in ym4r. 
 
-The constructor takes as argument a list of GLatLng or a list of 2-element arrays, which will be transformed into GLatLng for you. Note that for polygons, the last point must be equal to the first, in order to have a closed loop. It can also take the color (in the #rrggbb form) of the stroke, the weight of the stroke, the opacity of the stroke, as well as the color of the fill and the opacity. These arguments are optional though.
+The constructor takes as argument a list of GLatLng or a list of 2-element arrays, which will be transformed into GLatLng for you. Note that for polygons, the last point must be equal to the first, in order to have a closed loop. It can also take the color (in the <tt>#rrggbb</tt> form) of the stroke, the weight of the stroke, the opacity of the stroke, as well as the color of the fill and the opacity. These arguments are optional though.
 
 For example:
-	GPolyline.new([[12.4,6.6],[4.5,1.2],[-5.6,-12.4],[12.4,6.6]],"#ff0000",3,1.0,"#00ff00",1.0)
+	GPolygon.new([[12.4,6.6],[4.5,1.2],[-5.6,-12.4],[12.4,6.6]],"#ff0000",3,1.0,"#00ff00",1.0)
 
 Then you add it like any other overlay:
 	@map.overlay_init(polygon)
