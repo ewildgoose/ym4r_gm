@@ -20,6 +20,14 @@ Ym4r::GmPlugin::GLatLng.class_eval do
   end
 end
 
+Ym4r::GmPlugin::GLatLngBounds.class_eval do
+  #Creates a GLatLng object from a georuby point. Assumes the points of the line strings are stored in Longitude(x)/Latitude(y) order.
+  def self.from_georuby(envelope)
+    GLatLngBounds.new(GLatLng.from_georuby(envelope.lower_corner),
+                      GLatLng.from_georuby(envelope.upper_corner))
+  end
+end
+
 Ym4r::GmPlugin::GPolygon.class_eval do
   #Creates a GPolygon object from a georuby polygon or line string. Assumes the points of the line strings are stored in Longitude(x)/Latitude(y) order.
   def self.from_georuby(ls_or_p, stroke_color="#000000",stroke_weight=1,stroke_opacity=1.0,color="#ff0000",opacity=1.0)
