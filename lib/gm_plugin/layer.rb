@@ -98,7 +98,7 @@ module Ym4r
       #Options are the same as with GTileLayer + :styles (""), :merc_proj (:mapserver), :use_geographic (false)
       def initialize(base_url, layers, options = {})
         super(options)
-        @base_url = base_url
+        @base_url = base_url.gsub(/\?$/,"") #standardize the url
         @layers = layers
         @styles = options[:styles] || ""
         merc_proj = options[:merc_proj] || :mapserver

@@ -28,8 +28,9 @@ module Ym4r
       #Outputs the header necessary to use the Google Maps API, by including the JS files of the API, as well as a file containing YM4R/GM helper functions. By default, it also outputs a style declaration for VML elements. This default can be overriddent by passing <tt>:with_vml => false</tt> as option to the method. You can also pass a <tt>:host</tt> option in order to select the correct API key for the location where your app is currently running, in case the current environment has multiple possible keys. Usually, in this case, you should pass it <tt>@request.host</tt>. If you have defined only one API key for the current environment, the <tt>:host</tt> option is ignored. Finally you can override all the key settings in the configuration by passing a value to the <tt>:key</tt> key.
       def self.header(options = {})
         options[:with_vml] = true unless options.has_key?(:with_vml)
+        options[:hl] ||= ''
         api_key = ApiKey.get(options)
-        a = "<script src=\"http://maps.google.com/maps?file=api&amp;v=2&amp;key=#{api_key}\" type=\"text/javascript\"></script>\n"
+        a = "<script src=\"http://maps.google.com/maps?file=api&amp;v=2&amp;key=#{api_key}&amp;hl=#{options[:hl]}\" type=\"text/javascript\"></script>\n"
         a << "<script src=\"/javascripts/ym4r-gm.js\" type=\"text/javascript\"></script>\n"
         a << "<style type=\"text/css\">\n v\:* { behavior:url(#default#VML);}\n</style>" if options[:with_vml]
         a
