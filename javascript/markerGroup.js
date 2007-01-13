@@ -39,7 +39,7 @@ GMarkerGroup.prototype.copy = function() {
 //Inactivate the Marker group and clear the internal content
 GMarkerGroup.prototype.clear = function(){
     //deactivate the map first (which removes the markers from the map)
-    this.deactivate;
+    this.deactivate();
     //Clear the internal content
     this.markers = new Array();
     this.markersById = new Object();
