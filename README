@@ -163,7 +163,7 @@ Then you add it like any other overlay:
 ===GMarkerGroup
 A new type of GOverlay is available, called GMarkerGroup. 
 
-<b>To use it you would have to include in your HTML template the JavaScript file <tt>markerGroup.js</tt>.</b> You should have something like that in your template:
+<b>To use it you would have to include in your HTML template the JavaScript file <tt>markerGroup.js</tt> after the call to <tt>GMap.header</tt> (because it extends the GOverlay class).</b> You should have something like that in your template:
 	<%= javascript_include_tag("markerGroup") %>
 
 It is useful in 2 situations:
@@ -193,7 +193,7 @@ You can center and zoom on all the markers in the group by calling <tt>GMarkerGr
 ===Clusterer
 A Clusterer is a type of overlay that contains a potentially very large group of markers. It is engineered so markers close to each other and undistinguishable from each other at some level of zoom, appear as only one marker on the map at that level of zoom. Therefore it is possible to have a very large number of markers on the map at the same time and not having the map crawl to a halt in order to display them. It has been slightly modified from Jef Poskanzer's original Clusterer2 code (see http://www.acme.com/javascript/ for the original version). The major difference with that version is that, in YM4R, the clusterer is a GOverlay and can therefore be added to the map with <tt>map.addOverlay(clusterer)</tt> and is cleared along with the rest of overlays when <tt>map.clearOverlays()</tt> is called.
 
-<b>In order to use a clusterer, you should include in your template page the clusterer.js file.</b> You should have something like that in your template:
+<b>In order to use a clusterer, you should include in your template page the clusterer.js file after the call to <tt>GMap.header</tt> (because it extends the GOverlay class).</b> You should have something like that in your template:
 	<%= javascript_include_tag("clusterer") %>
 
 To create a clusterer, you should first create an array of all the GMarkers that you want to include in the clusterer (you can still add more after the clusterer has been added to the map though). When GMarkers close together are grouped in one cluster (represented by another marker on the map) and the user clicks on the cluster marker, a list of markers in the cluster is displayed in the info windo with a description: By default it is equal to the +title+ of the markers (which is also displayed as a tooltip when hovering on the marker with the mouse). If you don't want that, you can also pass to the GMarker constructor a key-value pair with key <tt>:description</tt> to have a description different from the title. For example, here is how you would create a clusterer:
