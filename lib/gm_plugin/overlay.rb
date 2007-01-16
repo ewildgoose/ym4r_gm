@@ -183,6 +183,44 @@ module Ym4r
       end
     end
 
+    #Can be used to implement a clusterer, similar to the clusterer below, except that there is more stuff to manage explicitly byt the programmer (but this is also more flexible). See the README for usage esamples.
+    class GMarkerManager
+      include MappingObject
+      
+      attr_accessor :map,:options,:managed_markers
+            
+      #options can be <tt>:border_padding</tt>, <tt>:max_zoom</tt>, <tt>:track_markers</tt> and <tt>:managed_markers</tt>: managed_markers must be an array of ManagedMarker objects
+      def initialize(map, options = {})
+        @map = map
+        @managed_markers = Array(options.delete(:managed_markers)) #[] if nil
+        @options = options
+      end
+
+      def create
+        puts @options.inspect
+        "addMarkersToManager(new GMarkerManager(#{MappingObject.javascriptify_variable(@map)},#{MappingObject.javascriptify_variable(@options)}),#{MappingObject.javascriptify_variable(@managed_markers)})"
+      end
+
+    end
+
+    #A set of similarly managed markers: They share the same minZoom and maxZoom.
+    class ManagedMarker
+      include MappingObject
+      
+      attr_accessor :markers,:min_zoom, :max_zoom
+      
+      def initialize(markers,min_zoom,max_zoom = nil)
+        @markers = markers
+        @min_zoom = min_zoom
+        @max_zoom = max_zoom
+      end
+
+      def create
+        "new ManagedMarker(#{MappingObject.javascriptify_variable(@markers)},#{MappingObject.javascriptify_variable(@min_zoom)},#{MappingObject.javascriptify_variable(@max_zoom)})"
+      end
+      
+    end
+
     #Makes the link with the Clusterer2 library by Jef Poskanzer (slightly modified though). Is a GOverlay making clusters out of its GMarkers, so that GMarkers very close to each other appear as one when the zoom is low. When the zoom gets higher, the individual markers are drawn.
     class Clusterer
       include MappingObject

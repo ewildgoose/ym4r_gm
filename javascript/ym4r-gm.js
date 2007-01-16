@@ -91,5 +91,22 @@ function setWindowDims(elem) {
     }
 }
 
+ManagedMarker = function(markers,minZoom,maxZoom) {
+    this.markers = markers;
+    this.minZoom = minZoom;
+    this.maxZoom = maxZoom;
+}
+
+//Add the markers and refresh
+function addMarkersToManager(manager,managedMarkers){
+    for(var i = 0, length = managedMarkers.length; i < length;i++) {
+	mm = managedMarkers[i];
+	manager.addMarkers(mm.markers,mm.minZoom,mm.maxZoom);
+    }
+    manager.refresh();
+    return manager;
+}
+
+
 var INVISIBLE = new GLatLng(0,0); //almost always invisible
 window.onunload = GUnload;

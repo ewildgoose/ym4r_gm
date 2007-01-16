@@ -190,6 +190,35 @@ You can call +activate+ and +deactivate+ to display or undisplay a group of mark
 You can center and zoom on all the markers in the group by calling <tt>GMarkerGroup#centerAndZoomOnMarkers()</tt> after the group has been added to a map. So for example, if you would want to do that at initalization time, you would do the following (assuming your marker group has been declared as +group+):
 	@map.record_init group.center_and_zoom_on_markers
 
+===GMarkerManager
+It is a recent (v2.67) GMaps API class that manages the efficient display of potentially thousands of markers. It is similar to the Clusterer (see below) since markers start appearing at specified zoom levels. The clustering behaviour has to be managed explicitly though by specifying the cluster for smaller zoom levels and specify the expanded cluster for larger zoom levels and so on. Note that it is not an overlay and is not added to the map through an overlay_init call.
+
+Here is an example of use:
+    @map = GMap.new("map_div")
+    @map.control_init(:large_map => true, :map_type => true)
+    @map.center_zoom_init([59.91106, 10.72223],3)
+    srand 1234
+    markers1 = []
+    1.upto(20) do  |i|
+      markers1 << GMarker.new([59.91106 + 6 * rand - 3, 10.72223 + 6 * rand - 3],:title => "OY-20-#{i}")
+    end
+    managed_markers1 = ManagedMarker.new(markers1,0,7)
+
+    markers2 = []
+    1.upto(200) do  |i|
+      markers2 << GMarker.new([59.91106 + 6 * rand - 3, 10.72223 + 6 * rand - 3],:title => "OY-200-#{i}")
+    end
+    managed_markers2 = ManagedMarker.new(markers2,8,9)
+
+    markers3 = []
+    1.upto(1000) do  |i|
+      markers3 << GMarker.new([59.91106 +  6 * rand - 3, 10.72223 + 6 * rand - 3],:title => "OY-300-#{i}")
+    end
+    managed_markers3= ManagedMarker.new(markers3,10)
+
+    mm = GMarkerManager.new(@map,:managed_markers => [managed_markers1,managed_markers2,managed_markers3])
+    @map.declare_init(mm,"mgr")
+
 ===Clusterer
 A Clusterer is a type of overlay that contains a potentially very large group of markers. It is engineered so markers close to each other and undistinguishable from each other at some level of zoom, appear as only one marker on the map at that level of zoom. Therefore it is possible to have a very large number of markers on the map at the same time and not having the map crawl to a halt in order to display them. It has been slightly modified from Jef Poskanzer's original Clusterer2 code (see http://www.acme.com/javascript/ for the original version). The major difference with that version is that, in YM4R, the clusterer is a GOverlay and can therefore be added to the map with <tt>map.addOverlay(clusterer)</tt> and is cleared along with the rest of overlays when <tt>map.clearOverlays()</tt> is called.
 
