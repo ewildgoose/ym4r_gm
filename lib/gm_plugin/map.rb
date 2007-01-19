@@ -188,7 +188,8 @@ module Ym4r
 
       #Globally declare a MappingObject with variable name "name"
       def declare_global_init(variable,name)
-        @global_init << variable.declare(name)
+        @global_init << "var #{name};"
+        @init << variable.assign_to(name)
       end
       
       #Outputs the initialization code for the map. By default, it outputs the script tags, performs the initialization in response to the onload event of the window and makes the map globally available. If you pass +true+ to the option key <tt>:full</tt>, the map will be setup in full screen, in which case it is not necessary (but not harmful) to set a size for the map div.
