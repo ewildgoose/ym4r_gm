@@ -36,11 +36,14 @@ module Ym4r
         a
       end
      
-      #Outputs the <div id=...></div> which has been configured to contain the map. You can pass <tt>:width</tt> and <tt>:height</tt> as options to output this in the style attribute of the DIV element (you could also achieve the same effect by putting the dimension info into a CSS or using the instance method GMap#header_width_height)
+      #Outputs the <div id=...></div> which has been configured to contain the map. You can pass <tt>:width</tt> and <tt>:height</tt> as options to output this in the style attribute of the DIV element (you could also achieve the same effect by putting the dimension info into a CSS or using the instance method GMap#header_width_height). You can aslo pass <tt>:class</tt> to set the classname of the div.
       def div(options = {})
         attributes = "id=\"#{@container}\" "
         if options.has_key?(:height) && options.has_key?(:width)
-          attributes += "style=\"width:#{options[:width]}px;height:#{options[:height]}px\""
+          attributes += "style=\"width:#{options[:width]}px;height:#{options[:height]}px\" "
+        end
+        if options.has_key?(:class)
+          attributes += "class=\"#{options[:class]}\" "
         end
         "<div #{attributes}></div>"
       end
