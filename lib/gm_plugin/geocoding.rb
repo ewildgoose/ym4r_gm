@@ -16,33 +16,66 @@ module Ym4r
       #Gets placemarks by querying the Google Maps Geocoding service with the +request+ string. Options can either an explicity GMaps API key (<tt>:key</tt>) or a host, (<tt>:host</tt>). 
       def self.get(request,options = {})
         api_key = ApiKey.get(options)
+        output =  options[:output] || "kml"
+        url = "http://maps.google.com/maps/geo?q=#{URI.encode(request)}&key=#{api_key}&output=#{output}"
         
-        url = "http://maps.google.com/maps/geo?q=#{URI.encode(request)}&key=#{api_key}&output=kml"
-        xml = open(url).read
-                
-        doc = REXML::Document.new(xml) 
-                        
-        response = doc.elements['//Response']
-        placemarks = Placemarks.new(response.elements['name'].text,response.elements['Status/code'].text.to_i)
-        response.elements.each("Placemark") do |placemark|
-          data = placemark.elements
-          data_country = data['//CountryNameCode']
-          data_administrative = data['//AdministrativeAreaName']
-          data_sub_administrative = data['//SubAdministrativeAreaName']
-          data_locality = data['//LocalityName']
-          data_dependent_locality = data['//DependentLocalityName']
-          data_thoroughfare = data['//ThoroughfareName']
-          data_postal_code = data['//PostalCodeNumber']
-          placemarks << Geocoding::Placemark.new(data['address'].text,
-                                                 data_country.nil? ? "" : data_country.text,
-                                                 data_administrative.nil? ? "" : data_administrative.text,
-                                                 data_sub_administrative.nil? ? "" : data_sub_administrative.text,
-                                                 data_locality.nil? ? "" : data_locality.text,
-                                                 data_dependent_locality.nil? ? "" : data_dependent_locality.text,
-                                                 data_thoroughfare.nil? ? "" : data_thoroughfare.text,
-                                                 data_postal_code.nil? ? "" : data_postal_code.text,
-                                                 *(data['//coordinates'].text.split(",")[0..1].collect {|l| l.to_f }))
+        res = open(url).read
+        
+        case output.to_sym
+          when :json
+          res = eval(res.gsub(":","=>")) #!!!EVAL EVAL EVAL EVAL!!! hopefully we can trust google...
+          placemarks = Placemarks.new(res['name'],res['Status']['code'])
+          if res['Placemark']
+            placemark = res['Placemark']
+   
+            placemark.each do |data|
+              
+              data_country = data['Country']['CountryNameCode'] rescue ""
+              data_administrative = data['Country']['AdministrativeArea']['AdministrativeAreaName'] rescue ""
+              data_sub_administrative = data['Country']['AdministrativeArea']['SubAdministrativeArea']['SubAdministrativeAreaName'] rescue ""
+              data_locality = data['Country']['AdministrativeArea']['SubAdministrativeArea']['Locality']['LocalityName'] rescue ""
+              data_dependent_locality = data['Country']['AdministrativeArea']['SubAdministrativeArea']['Locality']['DependentLocality']['DependentLocalityName'] rescue ""
+              data_thoroughfare = data['Country']['AdministrativeArea']['SubAdministrativeArea']['Locality']['DependentLocality']['Thoroughfare']['ThoroughfareName'] rescue ""
+              data_postal_code = data['Country']['AdministrativeArea']['SubAdministrativeArea']['Locality']['DependentLocality']['Thoroughfare']['PostalCode']['PostalCodeNumber'] rescue ""
+        
+              placemarks << Geocoding::Placemark.new(data['address'],
+                                                     data_country,
+                                                     data_administrative,
+                                                     data_sub_administrative,
+                                                     data_locality,
+                                                     data_dependent_locality,
+                                                     data_thoroughfare,
+                                                     data_postal_code,
+                                                     *(data['Point']['coordinates'][0,2]))
+                                                     
+            end
+          end
+          when :kml, :xml
+          doc = REXML::Document.new(res) 
+                  
+          response = doc.elements['//Response']
+          placemarks = Placemarks.new(response.elements['name'].text,response.elements['Status/code'].text.to_i)
+          response.elements.each("Placemark") do |placemark|
+            data = placemark.elements
+            data_country = data['//CountryNameCode']
+            data_administrative = data['//AdministrativeAreaName']
+            data_sub_administrative = data['//SubAdministrativeAreaName']
+            data_locality = data['//LocalityName']
+            data_dependent_locality = data['//DependentLocalityName']
+            data_thoroughfare = data['//ThoroughfareName']
+            data_postal_code = data['//PostalCodeNumber']
+            placemarks << Geocoding::Placemark.new(data['address'].text,
+                                                   data_country.nil? ? "" : data_country.text,
+                                                   data_administrative.nil? ? "" : data_administrative.text,
+                                                   data_sub_administrative.nil? ? "" : data_sub_administrative.text,
+                                                   data_locality.nil? ? "" : data_locality.text,
+                                                   data_dependent_locality.nil? ? "" : data_dependent_locality.text,
+                                                   data_thoroughfare.nil? ? "" : data_thoroughfare.text,
+                                                   data_postal_code.nil? ? "" : data_postal_code.text,
+                                                   *(data['//coordinates'].text.split(",")[0..1].collect {|l| l.to_f }))
+          end
         end
+                
         placemarks
       end
 
