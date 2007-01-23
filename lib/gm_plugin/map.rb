@@ -202,13 +202,22 @@ module Ym4r
         no_declare = options[:no_declare]
         no_global = options[:no_global]
         fullscreen = options[:full]
+        load_pr = options[:proto_load] #to prevent some problems when the onload event callback from Prototype is used
         
         html = ""
         html << "<script type=\"text/javascript\">\n" if !no_script_tag
         #put the functions in a separate javascript file to be included in the page
         html << @global_init * "\n"
         html << "var #{@variable};\n" if !no_declare and !no_global
-        html << "window.onload = addCodeToFunction(window.onload,function() {\nif (GBrowserIsCompatible()) {\n" if !no_load
+        if !no_load
+          if load_pr
+            html << "Event.observe(window,'load',"
+          else
+            html << "window.onload = addCodeToFunction(window.onload,"
+          end
+        end
+
+        html << "function() {\nif (GBrowserIsCompatible()) {\n" 
         
         if fullscreen
           #Adding the initial resizing and setting up the event handler for
