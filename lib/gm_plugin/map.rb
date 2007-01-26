@@ -169,8 +169,8 @@ module Ym4r
       end
       
       #Initializes an icon  and makes it globally accessible through the JavaScript variable of name +variable+.
-      def icon_global_init(icon , name)
-        declare_global_init(icon,name)
+      def icon_global_init(icon , name, options = {})
+        declare_global_init(icon,name,options)
       end
 
       #Registers an event
@@ -184,15 +184,19 @@ module Ym4r
       end
       
       #Declares the overlay globally with name +name+
-      def overlay_global_init(overlay,name)
-        declare_global_init(overlay,name)
+      def overlay_global_init(overlay,name, options = {})
+        declare_global_init(overlay,name, options)
         @init << add_overlay(overlay)
       end
 
-      #Globally declare a MappingObject with variable name "name"
-      def declare_global_init(variable,name)
-        @global_init << "var #{name};"
-        @init << variable.assign_to(name)
+      #Globally declare a MappingObject with variable name "name". Option <tt>:local_construction</tt> should be passed if the construction has to be done inside the onload callback method (for exsample if it depends on the GMap to be initialized)
+      def declare_global_init(variable,name, options = {})
+        unless options[:local_construction]
+          @global_init << "var #{variable.assign_to(name)}"
+        else
+          @global_init << "var #{name};"
+          @init << variable.assign_to(name)
+        end
       end
       
       #Outputs the initialization code for the map. By default, it outputs the script tags, performs the initialization in response to the onload event of the window and makes the map globally available. If you pass +true+ to the option key <tt>:full</tt>, the map will be setup in full screen, in which case it is not necessary (but not harmful) to set a size for the map div.
