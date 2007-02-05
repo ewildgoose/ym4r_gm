@@ -1,5 +1,8 @@
 $:.unshift(File.dirname(__FILE__) + '/../lib')
 
+require File.expand_path(File.dirname(__FILE__) + "/../../../../config/environment")
+
+
 require 'ym4r_gm'
 require 'test/unit'
 
