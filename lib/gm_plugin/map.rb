@@ -219,9 +219,10 @@ module Ym4r
           else
             html << "window.onload = addCodeToFunction(window.onload,"
           end
+          html << "function() {\n"
         end
 
-        html << "function() {\nif (GBrowserIsCompatible()) {\n" 
+        html << "if (GBrowserIsCompatible()) {\n" 
         
         if fullscreen
           #Adding the initial resizing and setting up the event handler for
@@ -238,7 +239,8 @@ module Ym4r
         html << @init_begin * "\n"
         html << @init * "\n"
         html << @init_end * "\n"
-        html << "\n}\n});\n" if !no_load
+        html << "\n}\n"
+        html << "});\n" if !no_load
         html << "</script>" if !no_script_tag
         
         if fullscreen
