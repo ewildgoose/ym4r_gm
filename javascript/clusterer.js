@@ -345,7 +345,7 @@ Clusterer.popUp = function ( cluster ){
 
 Clusterer.rePop = function ( clusterer ){
     if ( clusterer.poppedUpCluster != null )
-	Clusterer.popUp( poppedUpCluster );
+	Clusterer.popUp( clusterer.poppedUpCluster );
 };
 
 Clusterer.popDown = function ( clusterer ){
