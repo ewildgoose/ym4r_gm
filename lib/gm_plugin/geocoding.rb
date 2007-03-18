@@ -37,6 +37,11 @@ module Ym4r
               data_dependent_locality = data['Country']['AdministrativeArea']['SubAdministrativeArea']['Locality']['DependentLocality']['DependentLocalityName'] rescue ""
               data_thoroughfare = data['Country']['AdministrativeArea']['SubAdministrativeArea']['Locality']['DependentLocality']['Thoroughfare']['ThoroughfareName'] rescue ""
               data_postal_code = data['Country']['AdministrativeArea']['SubAdministrativeArea']['Locality']['DependentLocality']['Thoroughfare']['PostalCode']['PostalCodeNumber'] rescue ""
+              lon, lat = data['Point']['coordinates'][0,2]
+              data_accuracy = data['Accuracy']
+              unless data_accuracy.nil?
+                data_accuracy = data_accuracy.to_i
+              end
         
               placemarks << Geocoding::Placemark.new(data['address'],
                                                      data_country,
@@ -46,7 +51,7 @@ module Ym4r
                                                      data_dependent_locality,
                                                      data_thoroughfare,
                                                      data_postal_code,
-                                                     *(data['Point']['coordinates'][0,2]))
+                                                     lon, lat, data_accuracy)
                                                      
             end
           end
@@ -64,6 +69,11 @@ module Ym4r
             data_dependent_locality = data['//DependentLocalityName']
             data_thoroughfare = data['//ThoroughfareName']
             data_postal_code = data['//PostalCodeNumber']
+            lon, lat = data['//coordinates'].text.split(",")[0..1].collect {|l| l.to_f }
+            data_accuracy = data['//*[local-name()="AddressDetails"]'].attributes['Accuracy']
+            unless data_accuracy.nil?
+               data_accuracy = data_accuracy.to_i
+             end
             placemarks << Geocoding::Placemark.new(data['address'].text,
                                                    data_country.nil? ? "" : data_country.text,
                                                    data_administrative.nil? ? "" : data_administrative.text,
@@ -72,7 +82,7 @@ module Ym4r
                                                    data_dependent_locality.nil? ? "" : data_dependent_locality.text,
                                                    data_thoroughfare.nil? ? "" : data_thoroughfare.text,
                                                    data_postal_code.nil? ? "" : data_postal_code.text,
-                                                   *(data['//coordinates'].text.split(",")[0..1].collect {|l| l.to_f }))
+                                                   lon, lat, data_accuracy )
           end
         end
                 
@@ -91,7 +101,7 @@ module Ym4r
       end
 
       #A result from the Geocoding service.
-      class Placemark < Struct.new(:address,:country_code,:administrative_area,:sub_administrative_area,:locality,:dependent_locality,:thoroughfare,:postal_code,:longitude,:latitude)
+      class Placemark < Struct.new(:address,:country_code,:administrative_area,:sub_administrative_area,:locality,:dependent_locality,:thoroughfare,:postal_code,:longitude,:latitude,:accuracy)
         def lonlat
           [longitude,latitude]
         end
