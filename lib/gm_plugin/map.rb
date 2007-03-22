@@ -30,7 +30,7 @@ module Ym4r
         options[:with_vml] = true unless options.has_key?(:with_vml)
         options[:hl] ||= ''
         api_key = ApiKey.get(options)
-        a = "<script src=\"http://maps.google.com/maps?file=api&amp;v=2&amp;key=#{api_key}&amp;hl=#{options[:hl]}\" type=\"text/javascript\"></script>\n"
+        a = "<script src=\"http://maps.google.com/maps?file=api&amp;v=2.x&amp;key=#{api_key}&amp;hl=#{options[:hl]}\" type=\"text/javascript\"></script>\n"
         a << "<script src=\"/javascripts/ym4r-gm.js\" type=\"text/javascript\"></script>\n"
         a << "<style type=\"text/css\">\n v\:* { behavior:url(#default#VML);}\n</style>" if options[:with_vml]
         a

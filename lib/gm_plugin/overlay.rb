@@ -161,6 +161,22 @@ module Ym4r
         a << ")"
       end
     end
+
+    #A GGeoXml object gets data from a GeoRSS or KML feed and displays it. Use <tt>overlay_init</tt> to add it to a map at initialization time.
+    class GGeoXml
+      include MappingObject
+      
+      attr_accessor :url
+
+      def initialize(url)
+        @url = url
+      end
+
+      def create
+        "new GGeoXml(#{MappingObject.javascriptify_variable(@url)})"
+      end
+
+    end
     
     #A GOverlay representing a group of GMarkers. The GMarkers can be identified with an id, which can be used to show the info window of a specific marker, in reponse, for example, to a click on a link. The whole group can be shown on and off at once. It should be declared global at initialization time to be useful.
     class GMarkerGroup

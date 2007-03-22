@@ -56,6 +56,7 @@ module Ym4r
             end
           end
           when :kml, :xml
+          
           doc = REXML::Document.new(res) 
                   
           response = doc.elements['//Response']
