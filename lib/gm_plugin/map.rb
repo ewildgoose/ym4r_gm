@@ -40,10 +40,10 @@ module Ym4r
       def div(options = {})
         attributes = "id=\"#{@container}\" "
         if options.has_key?(:height) && options.has_key?(:width)
-          attributes += "style=\"width:#{options[:width]}px;height:#{options[:height]}px\" "
+          attributes += "style=\"width:#{options.delete(:width)}px;height:#{options.delete(:height)}px\" "
         end
         if options.has_key?(:class)
-          attributes += "class=\"#{options[:class]}\" "
+          attributes += options.keys.map {|opt| "#{opt}=\"#{options[opt]}\"" }.join(" ")
         end
         "<div #{attributes}></div>"
       end
