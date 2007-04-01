@@ -20,7 +20,7 @@ module Ym4r
         url = "http://maps.google.com/maps/geo?q=#{URI.encode(request)}&key=#{api_key}&output=#{output}"
         
         res = open(url).read
-        
+
         case output.to_sym
           when :json
           res = eval(res.gsub(":","=>")) #!!!EVAL EVAL EVAL EVAL!!! hopefully we can trust google...
