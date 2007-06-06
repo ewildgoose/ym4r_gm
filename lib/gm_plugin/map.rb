@@ -68,7 +68,7 @@ module Ym4r
         @init_end << add_control(GOverviewMapControl.new) if controls[:overview_map]
       end
       
-      #Initializes the interface configuration: double-click zoom, dragging, continuous zoom,... You can pass a hash with keys <tt>:dragging</tt>, <tt>:info_window</tt>, <tt>:double_click_zoom</tt>, <tt>:continuous_zoom</tt>. The values should be true or false. Check the google maps API doc to know what the default values are.
+      #Initializes the interface configuration: double-click zoom, dragging, continuous zoom,... You can pass a hash with keys <tt>:dragging</tt>, <tt>:info_window</tt>, <tt>:double_click_zoom</tt>, <tt>:continuous_zoom</tt> and <tt>:scroll_wheel_zoom</tt>. The values should be true or false. Check the google maps API doc to know what the default values are.
       def interface_init(interface = {})
         if !interface[:dragging].nil?
           if interface[:dragging]
@@ -96,6 +96,13 @@ module Ym4r
             @init << enableContinuousZoom()
           else
             @init << disableContinuousZoom()
+          end
+        end
+        if !interface[:scroll_wheel_zoom].nil?
+          if interface[:scroll_wheel_zoom]
+            @init << enableScrollWheelZoom()
+          else
+            @init << disableScrollWheelZoom()()
           end
         end
       end

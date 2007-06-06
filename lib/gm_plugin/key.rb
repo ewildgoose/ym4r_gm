@@ -12,7 +12,8 @@ module Ym4r
       unless File.exist?(RAILS_ROOT + '/config/gmaps_api_key.yml')
         raise GMapsAPIKeyConfigFileNotFoundException.new("File RAILS_ROOT/config/gmaps_api_key.yml not found")
       else
-        GMAPS_API_KEY = YAML.load_file(RAILS_ROOT + '/config/gmaps_api_key.yml')[ENV['RAILS_ENV']]
+        env = ENV['RAILS_ENV'] || RAILS_ENV
+        GMAPS_API_KEY = YAML.load_file(RAILS_ROOT + '/config/gmaps_api_key.yml')[env]
       end
       
       def self.get(options = {})

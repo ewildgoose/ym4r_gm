@@ -18,7 +18,7 @@ module Ym4r
         api_key = ApiKey.get(options)
         output =  options[:output] || "kml"
         url = "http://maps.google.com/maps/geo?q=#{URI.encode(request)}&key=#{api_key}&output=#{output}"
-        
+
         res = open(url).read
 
         case output.to_sym
@@ -58,20 +58,20 @@ module Ym4r
           when :kml, :xml
           
           doc = REXML::Document.new(res) 
-                  
+
           response = doc.elements['//Response']
           placemarks = Placemarks.new(response.elements['name'].text,response.elements['Status/code'].text.to_i)
-          response.elements.each("Placemark") do |placemark|
+          response.elements.each(".//Placemark") do |placemark|
             data = placemark.elements
-            data_country = data['//CountryNameCode']
-            data_administrative = data['//AdministrativeAreaName']
-            data_sub_administrative = data['//SubAdministrativeAreaName']
-            data_locality = data['//LocalityName']
-            data_dependent_locality = data['//DependentLocalityName']
-            data_thoroughfare = data['//ThoroughfareName']
-            data_postal_code = data['//PostalCodeNumber']
-            lon, lat = data['//coordinates'].text.split(",")[0..1].collect {|l| l.to_f }
-            data_accuracy = data['//*[local-name()="AddressDetails"]'].attributes['Accuracy']
+            data_country = data['.//CountryNameCode']
+            data_administrative = data['.//AdministrativeAreaName']
+            data_sub_administrative = data['.//SubAdministrativeAreaName']
+            data_locality = data['.//LocalityName']
+            data_dependent_locality = data['.//DependentLocalityName']
+            data_thoroughfare = data['.//ThoroughfareName']
+            data_postal_code = data['.//PostalCodeNumber']
+            lon, lat = data['.//coordinates'].text.split(",")[0..1].collect {|l| l.to_f }
+            data_accuracy = data['.//*[local-name()="AddressDetails"]'].attributes['Accuracy']
             unless data_accuracy.nil?
                data_accuracy = data_accuracy.to_i
              end
