@@ -102,7 +102,7 @@ module Ym4r
           if interface[:scroll_wheel_zoom]
             @init << enableScrollWheelZoom()
           else
-            @init << disableScrollWheelZoom()()
+            @init << disableScrollWheelZoom()
           end
         end
       end
