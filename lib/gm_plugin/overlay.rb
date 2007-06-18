@@ -103,6 +103,39 @@ module Ym4r
         a << ")"
       end
     end
+
+    #Encoded GPolyline class
+    class GPolylineEncoded 
+      include MappingObject
+      attr_accessor :points,:color,:weight,:opacity,:levels,:zoom_factor,:num_levels
+
+      def initialize(options={})
+        #points = options[:points]
+        #if !points.empty? and points[0].is_a?(Array)
+        #  @points = points.collect { |pt| GLatLng.new(pt) }
+        #else
+        #@points = points
+          #end
+        @points = options[:points]
+        @color = options[:color]
+        @weight = options[:weight]
+        @opacity = options[:opacity]
+        @levels = options[:levels] || "BBBBBBBBBBBB"
+        @zoom_factor = options[:zoom_factor] || 32
+        @num_levels = options[:num_levels] || 4
+      end
+      def create
+        a = "new GPolyline.fromEncoded({points: #{MappingObject.javascriptify_variable(points)},\n" 
+        a << "levels: #{MappingObject.javascriptify_variable(@levels)},"
+        a << "zoomFactor: #{MappingObject.javascriptify_variable(@zoom_factor)},"
+        a << "numLevels: #{MappingObject.javascriptify_variable(@num_levels)}"
+        a << ",color: #{MappingObject.javascriptify_variable(@color)}" if @color
+        a << ",weight: #{MappingObject.javascriptify_variable(@weight)}" if @weight
+        a << ",opacity: #{MappingObject.javascriptify_variable(@opacity)}" if @opacity
+        a << "})"
+      end
+    end
+
     #A basic Latitude/longitude point.
     class GLatLng 
       include MappingObject
@@ -137,7 +170,7 @@ module Ym4r
       attr_accessor :points,:stroke_color,:stroke_weight,:stroke_opacity,:color,:opacity
       
       #Can take an array of +GLatLng+ or an array of 2D arrays. A method to directly build a polygon from a GeoRuby polygon is provided in the helper.rb file.
-      def initialize(points,stroke_color="#000000",stroke_weight=1,stroke_opacity=1.0,color="#ff0000",opacity=1.0)
+      def initialize(points,stroke_color="#000000",stroke_weight=1,stroke_opacity=1.0,color="#ff0000",opacity=1.0,encoded=false)
         if !points.empty? and points[0].is_a?(Array)
           @points = points.collect { |pt| GLatLng.new(pt) }
         else
@@ -150,7 +183,7 @@ module Ym4r
         @opacity = opacity
       end
       
-      #Creates a new polyline.
+      #Creates a new polygon
       def create
         a = "new GPolygon(#{MappingObject.javascriptify_variable(points)}"
         a << ",#{MappingObject.javascriptify_variable(@stroke_color)}"
@@ -161,6 +194,66 @@ module Ym4r
         a << ")"
       end
     end
+
+    class GPolygonEncoded 
+      include MappingObject
+      
+      attr_accessor :polyline, :color, :opacity, :outline, :fill
+      
+      def initialize(polylines,fill=true,color="#000000",opacity=0.5,outline=false)
+        #force polylines to be an array
+        if polylines.is_a? Array
+          @polylines = polylines
+        else
+          @polylines = [polylines]
+        end
+        @color = color
+        @fill = fill 
+        @opacity = opacity
+        @outline = outline
+      end
+      
+      #Creates a new polygon.
+      def create
+        polylines_for_polygon= []
+        @polylines.each do |p|
+          x = "{points: #{MappingObject.javascriptify_variable(p.points)}," 
+          x << "levels: #{MappingObject.javascriptify_variable(p.levels)},"
+          x << "zoomFactor: #{MappingObject.javascriptify_variable(p.zoom_factor)},"
+          x << "numLevels: #{MappingObject.javascriptify_variable(p.num_levels)} "
+          x << "}"
+          polylines_for_polygon << x
+        end
+
+        polylines_for_polygon = "[" + polylines_for_polygon.join(",") + "]"
+
+        a = "new GPolygon.fromEncoded({polylines: #{polylines_for_polygon},"
+        a << "fill: #{MappingObject.javascriptify_variable(@fill)},"
+        a << "color: #{MappingObject.javascriptify_variable(@color)},"
+        a << "opacity: #{MappingObject.javascriptify_variable(@opacity)},"
+        a << "outline: #{MappingObject.javascriptify_variable(@outline)}"
+        a << "})"
+      end
+    end
+
+    class ELabel
+      attr_accessor :point, :text, :style
+      include MappingObject
+
+      def initialize(point, text=nil, style=nil)
+        @point = point
+        @text = text
+        @style = style
+      end
+
+      def create
+          a = "new ELabel(#{MappingObject.javascriptify_variable(@point)}"
+          a << ",#{MappingObject.javascriptify_variable(@text)}" if @text
+          a << ",#{MappingObject.javascriptify_variable(@style)}" if @style
+          a << ")"
+      end
+    end
+
 
     #A GGeoXml object gets data from a GeoRSS or KML feed and displays it. Use <tt>overlay_init</tt> to add it to a map at initialization time.
     class GGeoXml
