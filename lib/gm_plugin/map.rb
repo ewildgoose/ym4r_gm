@@ -25,14 +25,18 @@ module Ym4r
         GMap.header(:with_vml => with_vml)
       end
 
-      #Outputs the header necessary to use the Google Maps API, by including the JS files of the API, as well as a file containing YM4R/GM helper functions. By default, it also outputs a style declaration for VML elements. This default can be overriddent by passing <tt>:with_vml => false</tt> as option to the method. You can also pass a <tt>:host</tt> option in order to select the correct API key for the location where your app is currently running, in case the current environment has multiple possible keys. Usually, in this case, you should pass it <tt>@request.host</tt>. If you have defined only one API key for the current environment, the <tt>:host</tt> option is ignored. Finally you can override all the key settings in the configuration by passing a value to the <tt>:key</tt> key. Finally, you can pass a language for the map type buttons with the <tt>:hl</tt> option (possible values are: Japanese (ja), French (fr), German (de), Italian (it), Spanish (es), Catalan (ca), Basque (eu) and Galician (gl): no values means english)
+      #Outputs the header necessary to use the Google Maps API, by including the JS files of the API, as well as a file containing YM4R/GM helper functions. By default, it also outputs a style declaration for VML elements. This default can be overriddent by passing <tt>:with_vml => false</tt> as option to the method. You can also pass a <tt>:host</tt> option in order to select the correct API key for the location where your app is currently running, in case the current environment has multiple possible keys. Usually, in this case, you should pass it <tt>@request.host</tt>. If you have defined only one API key for the current environment, the <tt>:host</tt> option is ignored. Finally you can override all the key settings in the configuration by passing a value to the <tt>:key</tt> key. You can pass a language for the map type buttons with the <tt>:hl</tt> option (possible values are: Japanese (ja), French (fr), German (de), Italian (it), Spanish (es), Catalan (ca), Basque (eu) and Galician (gl): no values means english). Finally, you can pass <tt>:local_search => true</tt> to get the header css and js information needed for the local search control. If you do want local search you must also add <tt>:local_search => true</tt> to the @map.control_init method.
       def self.header(options = {})
         options[:with_vml] = true unless options.has_key?(:with_vml)
         options[:hl] ||= ''
+        options[:local_search] = false unless options.has_key?(:local_search)
         api_key = ApiKey.get(options)
         a = "<script src=\"http://maps.google.com/maps?file=api&amp;v=2.x&amp;key=#{api_key}&amp;hl=#{options[:hl]}\" type=\"text/javascript\"></script>\n"
         a << "<script src=\"/javascripts/ym4r-gm.js\" type=\"text/javascript\"></script>\n" unless options[:without_js]
         a << "<style type=\"text/css\">\n v\:* { behavior:url(#default#VML);}\n</style>" if options[:with_vml]
+        a << "<script src=\"http://www.google.com/uds/api?file=uds.js&amp;v=1.0\" type=\"text/javascript\"></script>" if options[:local_search]
+        a << "<script src=\"http://www.google.com/uds/solutions/localsearch/gmlocalsearch.js\" type=\"text/javascript\"></script>\n" if options[:local_search]
+        a << "<style type=\"text/css\">@import url(\"http://www.google.com/uds/css/gsearch.css\");@import url(\"http://www.google.com/uds/solutions/localsearch/gmlocalsearch.css\");}</style>" if options[:local_search]
         a
       end
      
@@ -58,7 +62,7 @@ module Ym4r
         @init << code
       end
 
-      #Initializes the controls: you can pass a hash with keys <tt>:small_map</tt>, <tt>:large_map</tt>, <tt>:small_zoom</tt>, <tt>:scale</tt>, <tt>:map_type</tt> and <tt>:overview_map</tt> and a boolean value as the value (usually true, since the control is not displayed by default)
+      #Initializes the controls: you can pass a hash with keys <tt>:small_map</tt>, <tt>:large_map</tt>, <tt>:small_zoom</tt>, <tt>:scale</tt>, <tt>:map_type</tt>, <tt>:overview_map</tt> and a boolean value as the value (usually true, since the control is not displayed by default) and <tt>:local_search</tt>
       def control_init(controls = {})
         @init_end << add_control(GSmallMapControl.new) if controls[:small_map]
         @init_end << add_control(GLargeMapControl.new) if controls[:large_map]
@@ -66,6 +70,7 @@ module Ym4r
         @init_end << add_control(GScaleControl.new) if controls[:scale]
         @init_end << add_control(GMapTypeControl.new) if controls[:map_type]
         @init_end << add_control(GOverviewMapControl.new) if controls[:overview_map]
+        @init_end << add_control(GLocalSearchControl.new(controls[:anchor], controls[:offset_width], controls[:offset_height])) if controls[:local_search]
       end
       
       #Initializes the interface configuration: double-click zoom, dragging, continuous zoom,... You can pass a hash with keys <tt>:dragging</tt>, <tt>:info_window</tt>, <tt>:double_click_zoom</tt>, <tt>:continuous_zoom</tt> and <tt>:scroll_wheel_zoom</tt>. The values should be true or false. Check the google maps API doc to know what the default values are.
