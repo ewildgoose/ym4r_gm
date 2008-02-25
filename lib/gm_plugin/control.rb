@@ -35,6 +35,13 @@ module Ym4r
         "new GMapTypeControl()"
       end
     end
+     #Map type control. Report to the Google Maps API documentation for details.
+    class GHierarchicalMapTypeControl
+      include MappingObject
+      def create
+        "new GHierarchicalMapTypeControl()"
+      end
+    end    
     #Overview map control. Report to the Google Maps API documentation for details.
     class GOverviewMapControl
       include MappingObject

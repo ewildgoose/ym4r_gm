@@ -69,6 +69,7 @@ module Ym4r
         @init_end << add_control(GSmallZoomControl.new) if controls[:small_zoom]
         @init_end << add_control(GScaleControl.new) if controls[:scale]
         @init_end << add_control(GMapTypeControl.new) if controls[:map_type]
+        @init_end << add_control(GHierarchicalMapTypeControl.new) if controls[:hierarchical_map_type]        
         @init_end << add_control(GOverviewMapControl.new) if controls[:overview_map]
         @init_end << add_control(GLocalSearchControl.new(controls[:anchor], controls[:offset_width], controls[:offset_height])) if controls[:local_search]
       end
