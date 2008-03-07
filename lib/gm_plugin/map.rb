@@ -44,7 +44,15 @@ module Ym4r
       def div(options = {})
         attributes = "id=\"#{@container}\" "
         if options.has_key?(:height) && options.has_key?(:width)
-          attributes += "style=\"width:#{options.delete(:width)}px;height:#{options.delete(:height)}px\" "
+          width = options.delete(:width)
+          if width.is_a?(Integer) or width =~ /^[0-9]+$/
+            width = width.to_s + "px"
+          end
+          height = options.delete(:height)
+          if height.is_a?(Integer) or height =~ /^[0-9]+$/
+            height = height.to_s + "px"
+          end
+          attributes += "style=\"width:#{width};height:#{height}\" "
         end
         if options.has_key?(:class)
           attributes += options.keys.map {|opt| "#{opt}=\"#{options[opt]}\"" }.join(" ")
