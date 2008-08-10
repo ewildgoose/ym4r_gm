@@ -382,9 +382,14 @@ You can pass options to the control_init as well. They are:
 :anchor => [:bottom_left (default), :bottom_right, :top_left, :top_right] 
 :offset_width => 10 (default)
 :offset_height => 20 (default)
+:local_search_options => "{suppressZoomToBounds : true, 
+													resultList : google.maps.LocalSearch.RESULT_LIST_INLINE, 
+													suppressInitialResultSelection : true, 
+													searchFormHint : 'Local Search powered by Google', 
+													linkTarget : GSearch.LINK_TARGET_BLANK}"
 
-So if you wanted the local search control to be at the bottom right of the map, 30 pixel in from the right and 20 pixels above the bottom it would look like this:
-@map.control_init(:large_map => true, :map_type => true, :local_search => true, :anchor => :bottom_right, :offset_width => 30, :offset_height => 20)
+So if you wanted the local search control to be at the bottom right of the map, 30 pixel in from the right and 20 pixels above the bottom and some local search options it would look like this:
+@map.control_init(:large_map => true, :map_type => true, :local_search => true, :anchor => :bottom_right, :offset_width => 30, :offset_height => 20, :local_search_options => "{suppressZoomToBounds : true, resultList : google.maps.LocalSearch.RESULT_LIST_INLINE, suppressInitialResultSelection : true, searchFormHint : 'Local Search powered by Google', linkTarget : GSearch.LINK_TARGET_BLANK}")
 
 ==Recent changes
 - Local Search overlay added. See above for implementation.

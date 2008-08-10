@@ -49,10 +49,15 @@ module Ym4r
         "new GOverviewMapControl()"
       end
     end
-    #Local Search control. Report to the Google Maps API documentation for details.
-    #The first argument of the constructor is one of the following: :top_right, :top_left, :bottom_right, :bottom_left.
-    #The second and third arguments of the constructor are the offset width and height respectively in pixels.
-    class GLocalSearchControl < Struct.new(:anchor, :offset_width, :offset_height)
+    
+    # Local Search control. Report to the Google Maps API documentation for details.
+    # The first argument of the constructor is one of the following: :top_right, :top_left, :bottom_right, :bottom_left.
+    # The second and third arguments of the constructor are the offset width and height respectively in pixels.
+    # The fourth argument is a javascript hash of valid Google local search control options 
+    # (ex. {suppressZoomToBounds : true, resultList : google.maps.LocalSearch.RESULT_LIST_INLINE, 
+    # suppressInitialResultSelection : true, searchFormHint : 'Local Search powered by Google', 
+    # linkTarget : GSearch.LINK_TARGET_BLANK})
+    class GLocalSearchControl < Struct.new(:anchor, :offset_width, :offset_height, :options)
       include MappingObject
       def create
         if offset_width.nil? 
@@ -74,7 +79,7 @@ module Ym4r
                     else
                       "G_ANCHOR_BOTTOM_LEFT"
                     end
-        "new google.maps.LocalSearch(), new GControlPosition(#{js_anchor}, new GSize(#{ow},#{oh}))"
+        "new google.maps.LocalSearch(options), new GControlPosition(#{js_anchor}, new GSize(#{ow},#{oh}))"
       end
     end
 
