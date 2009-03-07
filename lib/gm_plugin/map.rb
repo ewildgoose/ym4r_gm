@@ -72,7 +72,7 @@ module Ym4r
         @init << code
       end
 
-      #Initializes the controls: you can pass a hash with keys <tt>:small_map</tt>, <tt>:large_map</tt>, <tt>:small_zoom</tt>, <tt>:scale</tt>, <tt>:map_type</tt>, <tt>:overview_map</tt> and a boolean value as the value (usually true, since the control is not displayed by default), <tt>:local_search</tt> and <tt>:local_search_options</tt>
+      #Initializes the controls: you can pass a hash with keys <tt>:small_map</tt>, <tt>:large_map</tt>, <tt>:small_zoom</tt>, <tt>:scale</tt>, <tt>:map_type</tt>, <tt>:overview_map</tt> and a boolean value as the value (usually true, since the control is not displayed by default), <tt>:local_search</tt>, <tt>:local_search_options</tt>, and <tt>:show_on_focus</tt>
       def control_init(controls = {})
         @init_end << add_control(GSmallMapControl.new) if controls[:small_map]
         @init_end << add_control(GLargeMapControl.new) if controls[:large_map]
@@ -82,6 +82,11 @@ module Ym4r
         @init_end << add_control(GHierarchicalMapTypeControl.new) if controls[:hierarchical_map_type]        
         @init_end << add_control(GOverviewMapControl.new) if controls[:overview_map]
         @init_end << add_control(GLocalSearchControl.new(controls[:anchor], controls[:offset_width], controls[:offset_height], controls[:local_search_options])) if controls[:local_search]
+        if controls[:show_on_focus]  # Should be last
+          @init_end << "#{@variable}.hideControls();"
+          event_init(self, :mouseover, "function(){#{@variable}.showControls();}")
+          event_init(self, :mouseout,  "function(){#{@variable}.hideControls();}")
+        end
       end
       
       #Initializes the interface configuration: double-click zoom, dragging, continuous zoom,... You can pass a hash with keys <tt>:dragging</tt>, <tt>:info_window</tt>, <tt>:double_click_zoom</tt>, <tt>:continuous_zoom</tt> and <tt>:scroll_wheel_zoom</tt>. The values should be true or false. Check the google maps API doc to know what the default values are.
