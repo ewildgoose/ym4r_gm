@@ -75,7 +75,7 @@ module Ym4r
         @init << code
       end
 
-      #Initializes the controls: you can pass a hash with keys <tt>:small_map</tt>, <tt>:large_map</tt>, <tt>:small_zoom</tt>, <tt>:scale</tt>, <tt>:map_type</tt>, <tt>:overview_map</tt> and a boolean value as the value (usually true, since the control is not displayed by default), <tt>:local_search</tt>, <tt>:local_search_options</tt>, and <tt>:show_on_focus</tt>
+      #Initializes the controls: you can pass a hash with keys <tt>:small_map</tt>, <tt>:large_map</tt>, <tt>:small_zoom</tt>, <tt>:scale</tt>, <tt>:map_type</tt>, <tt>:overview_map</tt> and hash of options controlling its display (<tt>:hide</tt> and <tt>:size</tt>), <tt>:local_search</tt>, <tt>:local_search_options</tt>, and <tt>:show_on_focus</tt>
       def control_init(controls = {})
         @init_end << add_control(GSmallMapControl.new) if controls[:small_map]
         @init_end << add_control(GLargeMapControl.new) if controls[:large_map]
@@ -83,7 +83,16 @@ module Ym4r
         @init_end << add_control(GScaleControl.new) if controls[:scale]
         @init_end << add_control(GMapTypeControl.new) if controls[:map_type]
         @init_end << add_control(GHierarchicalMapTypeControl.new) if controls[:hierarchical_map_type]        
-        @init_end << add_control(GOverviewMapControl.new) if controls[:overview_map]
+        if controls[:overview_map]
+          if controls[:overview_map].is_a?(Hash)
+            hide = controls[:overview_map][:hide]
+            size = controls[:overview_map][:size]
+          end
+          overview_control = GOverviewMapControl.new(size)
+          @init_end << overview_control.declare("#{@variable}_ovm") if hide
+          @init_end << add_control(overview_control)
+          @init_end << "#{overview_control.variable}.hide(true);" if hide
+        end
         @init_end << add_control(GLocalSearchControl.new(controls[:anchor], controls[:offset_width], controls[:offset_height], controls[:local_search_options])) if controls[:local_search]
         if controls[:show_on_focus]  # Should be last
           @init_end << "#{@variable}.hideControls();"

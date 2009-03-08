@@ -45,8 +45,11 @@ module Ym4r
     #Overview map control. Report to the Google Maps API documentation for details.
     class GOverviewMapControl
       include MappingObject
+      def initialize(size = nil)
+        @size = size
+      end
       def create
-        "new GOverviewMapControl()"
+        "new GOverviewMapControl(#{@size ? @size.create : ''})"
       end
     end
     
