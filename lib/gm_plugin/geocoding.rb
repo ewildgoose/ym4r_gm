@@ -16,8 +16,9 @@ module Ym4r
       #Gets placemarks by querying the Google Maps Geocoding service with the +request+ string. Options can either an explicity GMaps API key (<tt>:key</tt>) or a host, (<tt>:host</tt>). 
       def self.get(request,options = {})
         api_key = ApiKey.get(options)
+        sensor = options[:sensor] || false
         output =  options[:output] || "kml"
-        url = "http://maps.google.com/maps/geo?q=#{URI.encode(request)}&key=#{api_key}&output=#{output}"
+        url = "http://maps.google.com/maps/geo?q=#{URI.encode(request)}&key=#{api_key}&sensor=#{sensor}&output=#{output}"
 
         res = open(url).read
 
