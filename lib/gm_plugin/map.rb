@@ -89,7 +89,7 @@ module Ym4r
             size = controls[:overview_map][:size]
           end
           overview_control = GOverviewMapControl.new(size)
-          @init_end << overview_control.declare("#{@variable}_ovm") if hide
+          @global_init << overview_control.declare("#{@variable}_ovm") if hide
           @init_end << add_control(overview_control)
           @init_end << "#{overview_control.variable}.hide(true);" if hide
         end
